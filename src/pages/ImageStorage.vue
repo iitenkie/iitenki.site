@@ -207,7 +207,6 @@ export default {
         await tweets.find(),
         await illusts.find()
       );
-      console.log(pics);
       if (pics.length != 0) {
         for (let child in pics) {
           this.data.push(pics[child].attributes);
@@ -419,7 +418,6 @@ export default {
       send.shz = this.forceReview;
       send.resend = this.reSend;
       let ret = await this.$util.post("/cookieartbot/api/dynamic/upload", send);
-      console.log(ret);
       for (let i of items) {
         let item;
         if (i.site == "seiga") {

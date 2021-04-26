@@ -16,7 +16,10 @@ export default async ({ Vue }) => {
         url: `${path}`,
         data: data,
         responseType: "json",
-        headers: token === null ? {} : { token: token }
+        headers: token === null ? {} : { token: token },
+        validateStatus: status => {
+          return status < 500;
+        }
       });
     }
 
@@ -28,7 +31,10 @@ export default async ({ Vue }) => {
         url: `${path}`,
         params: params,
         responseType: "json",
-        headers: token === null ? {} : { token: token }
+        headers: token === null ? {} : { token: token },
+        validateStatus: status => {
+          return status < 500;
+        }
       });
     }
   }

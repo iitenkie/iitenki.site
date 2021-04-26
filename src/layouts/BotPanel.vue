@@ -26,12 +26,20 @@ export default {
     };
   },
   async created() {
-    console.log(await this.$util.get("/cookieartbot/api/getDynamic"))
-  },
-  watch: {
-    $route() {
-      console.log(this.$route);
-    }
+    this.$axios.interceptors.response.use(
+      response => {
+        if (
+          response.status == 401 &&
+          response.config.url != "/cookieartbot/login"
+        )
+          this.$router.push("/bot-panel/login");
+        return response;
+      },
+      error => {
+        return Promise.reject(error);
+      }
+    );
+    await this.$util.get("/cookieartbot/islogin");
   }
 };
 </script>

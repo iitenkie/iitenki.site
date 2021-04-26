@@ -17,6 +17,11 @@ const routes = [
     children: [
       { path: "", redirect: "image-storage" },
       {
+        path: "login",
+        component: () => import("pages/PanelLogin.vue"),
+        name: "登录"
+      },
+      {
         path: "image-storage",
         component: () => import("pages/ImageStorage.vue"),
         name: "图片存储"
