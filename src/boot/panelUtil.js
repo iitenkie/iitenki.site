@@ -13,7 +13,7 @@ export default async ({ Vue }) => {
 
       return axios({
         method: "post",
-        url: `/cookieartbot/api/${path}`,
+        url: `${path}`,
         data: data,
         responseType: "json",
         headers: token === null ? {} : { token: token }
@@ -25,7 +25,7 @@ export default async ({ Vue }) => {
 
       return axios({
         method: "get",
-        url: `/cookieartbot/api/${path}`,
+        url: `${path}`,
         params: params,
         responseType: "json",
         headers: token === null ? {} : { token: token }

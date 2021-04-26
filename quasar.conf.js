@@ -81,6 +81,10 @@ module.exports = function (/* ctx */) {
         '/cookieartbot': {
           target: 'https://iitenki.site',
           changeOrigin: true,
+        },
+        '/ajax': {
+          target: 'https://iitenki.site',
+          changeOrigin: true,
         }
       }
     },
@@ -89,7 +93,9 @@ module.exports = function (/* ctx */) {
     framework: {
       iconSet: 'material-icons', // Quasar icon set
       lang: 'en-us', // Quasar language pack
-      config: {},
+      config: {
+        notify: {}
+      },
 
       // Possible values for "importStrategy":
       // * 'auto' - (DEFAULT) Auto-import needed Quasar components & directives
@@ -107,6 +113,7 @@ module.exports = function (/* ctx */) {
       plugins: [
         'Meta',
         'LocalStorage',
+        'Notify',
       ]
     },
 

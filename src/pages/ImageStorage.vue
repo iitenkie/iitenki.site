@@ -9,9 +9,20 @@
         selection="multiple"
       >
         <template v-slot:top>
+          <q-checkbox
+            :value="
+              selected.length == 0
+                ? false
+                : selected.length < data.length
+                ? null
+                : true
+            "
+            @input="selectAll()"
+            class="col-auto"
+          />
           <div class="col-2 q-table__title">静画</div>
           <q-space />
-          <q-input label="图片ID" dense class="q-ma-xs">
+          <q-input v-model="imgAdd_input" label="图片ID" dense class="q-ma-xs">
             <template v-slot:append>
               <q-btn
                 @click="change_site()"
@@ -33,38 +44,91 @@
               >
             </template>
           </q-input>
-          <q-btn unelevated round class="q-ma-xs" color="positive" icon="add" />
+          <q-btn
+            @click="itemAppend()"
+            :disabled="!imgAdd_inputIsVaild"
+            :loading="loading"
+            unelevated
+            round
+            class="q-ma-xs"
+            color="positive"
+            icon="add"
+          >
+            <template v-slot:loading>
+              <q-spinner-facebook />
+            </template>
+          </q-btn>
           <q-btn unelevated round class="q-ma-xs" color="primary" icon="send">
             <q-menu>
               <div class="q-pa-md q-gutter-y-sm">
                 <div>
-                  <q-checkbox label="定时投递" />
+                  <q-checkbox v-model="timing" label="定时投递" />
                 </div>
                 <div>
-                  <q-checkbox label="强制审核" />
+                  <q-checkbox v-model="forceReview" label="强制审核" />
                 </div>
                 <div>
-                  <q-checkbox label="自动重发" />
+                  <q-checkbox v-model="reSend" label="被删自动重发" />
                 </div>
                 <div>
                   <q-btn
+                    @click="sendDynamic(selected)"
+                    :disabled="!isSendable || loading"
+                    :loading="loading"
                     label="投递"
                     push
                     color="white"
                     text-color="primary"
                     style="width: 100%;"
-                  />
+                  >
+                    <template v-slot:loading>
+                      <q-spinner-facebook />
+                    </template>
+                  </q-btn>
                 </div>
               </div>
             </q-menu>
           </q-btn>
-          <q-btn unelevated round class="q-ma-xs" color="red" icon="delete" />
+          <q-btn
+            @click="deleteItem(selected)"
+            :disabled="!isSendable || loading"
+            :loading="loading"
+            unelevated
+            round
+            class="q-ma-xs"
+            color="red"
+            icon="delete"
+          >
+            <template v-slot:loading>
+              <q-spinner-facebook />
+            </template>
+          </q-btn>
         </template>
         <template v-slot:item="props">
           <div class="col-xs-6 col-sm-6 col-md-4 q-pa-sm">
             <q-card>
               <div class="row">
                 <q-checkbox v-model="props.selected" class="col" />
+                <q-btn :disabled="loading" flat round icon="menu">
+                  <q-menu>
+                    <q-list>
+                      <q-item
+                        @click="sendDynamic(props.row)"
+                        clickable
+                        v-close-popup
+                      >
+                        <q-item-section>投递</q-item-section>
+                      </q-item>
+                      <q-item
+                        @click="deleteItem(props.row)"
+                        clickable
+                        v-close-popup
+                      >
+                        <q-item-section>删除</q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
               </div>
               <q-separator />
               <a
@@ -122,13 +186,19 @@ export default {
       data: [],
       selected: [],
       loading: false,
-      changeSite: 0
+      changeSite: 0,
+      imgAdd_input: "",
+      timing: false,
+      forceReview: false,
+      reSend: false,
+      datetime: "2000-01-01 00:00:00"
     };
   },
   methods: {
     async reset() {
       this.data = [];
       this.selected = [];
+      this.loading = false;
       let seigas = new this.$AV.Query("seigaList");
       let tweets = new this.$AV.Query("tweetList");
       let illusts = new this.$AV.Query("pixivList");
@@ -218,17 +288,168 @@ export default {
         sl.save();
       }
     },
-    itemAppend() {
+    async itemAppend() {
       this.loading = true;
+      if (this.changeSite == 0) {
+        if (this.imgAdd_input.indexOf("im") != -1) {
+          this.imgAdd_input = this.imgAdd_input.replace(/^im/g, "");
+        }
+        let ret;
+        try {
+          ret = await this.$util.post("/ajax/getSeigaData", this.imgAdd_input);
+          ret.data.site = "seiga";
+          try {
+            this.dbAppend(ret.data);
+            setTimeout(this.reset, 1250);
+          } catch (err) {
+            this.$q.notify({
+              message: `发生错误！\n${err}`,
+              color: "negative",
+              multiLine: true
+            });
+            this.loading = false;
+          }
+        } catch (err) {
+          this.$q.notify({
+            message: `发生错误！\n${err}`,
+            color: "negative",
+            multiLine: true
+          });
+          this.loading = false;
+        }
+      } else if (this.changeSite == 1) {
+        let ret;
+        try {
+          ret = await this.$util.post("/ajax/getTweetData", this.imgAdd_input);
+          ret.data.data.site = "twitter";
+          try {
+            this.dbAppend(ret.data.data);
+            setTimeout(this.reset, 1250);
+          } catch (err) {
+            this.$q.notify({
+              message: `发生错误！\n${err}`,
+              color: "negative",
+              multiLine: true
+            });
+            this.loading = false;
+          }
+        } catch (err) {
+          this.$q.notify({
+            message: `发生错误！\n${err}`,
+            color: "negative",
+            multiLine: true
+          });
+          this.loading = false;
+        }
+      } else if (this.changeSite == 1) {
+        let ret;
+        try {
+          ret = await this.$util.post("/ajax/getIllustData", this.imgAdd_input);
+          ret.data.site = "pixiv";
+          try {
+            this.dbAppend(ret.data);
+            setTimeout(this.reset, 1250);
+          } catch (err) {
+            this.$q.notify({
+              message: `发生错误！\n${err}`,
+              color: "negative",
+              multiLine: true
+            });
+            this.loading = false;
+          }
+        } catch (err) {
+          this.$q.notify({
+            message: `发生错误！\n${err}`,
+            color: "negative",
+            multiLine: true
+          });
+          this.loading = false;
+        }
+      }
+    },
+    deleteItem(items = []) {
+      this.loading = true;
+      if (!Array.isArray(items)) {
+        items = [items];
+      }
+      for (let i of items) {
+        let item;
+        if (i.site == "seiga") {
+          item = this.$AV.Object.createWithoutData("seigaList", i.objid);
+        } else if (i.site == "twitter") {
+          item = this.$AV.Object.createWithoutData("tweetList", i.objid);
+        } else if (i.site == "pixiv") {
+          item = this.$AV.Object.createWithoutData("pixivList", i.objid);
+        }
+        item.destroy();
+      }
+      setTimeout(this.reset, 1250);
     },
     change_site() {
       this.changeSite++;
       if (this.changeSite > 2) this.changeSite = 0;
+    },
+    selectAll() {
+      if (this.selected.length < this.data.length) {
+        this.selected = this.data;
+      } else this.selected = [];
+    },
+    async sendDynamic(items) {
+      this.loading = true;
+      if (!Array.isArray(items)) {
+        items = [items];
+      }
+      let send = {
+        data: [],
+        data_twi: [],
+        data_pixiv: []
+      };
+      for (let i of items) {
+        if (i.site == "seiga") send.data.push(i);
+        else if (i.site == "twitter") send.data_twi.push(i);
+        else if (i.site == "pixiv") send.data_pixiv.push(i);
+      }
+      if (this.timing == true) {
+        send.timing = true;
+        send.date = datetime;
+      } else {
+        send.timing = false;
+        send.date = null;
+      }
+      send.shz = this.forceReview;
+      send.resend = this.reSend;
+      let ret = await this.$util.post("/cookieartbot/api/dynamic/upload", send);
+      console.log(ret);
+      for (let i of items) {
+        let item;
+        if (i.site == "seiga") {
+          item = this.$AV.Object.createWithoutData("seigaList", i.objid);
+        } else if (i.site == "twitter") {
+          item = this.$AV.Object.createWithoutData("tweetList", i.objid);
+        } else if (i.site == "pixiv") {
+          item = this.$AV.Object.createWithoutData("pixivList", i.objid);
+        }
+        item.destroy();
+      }
+      this.$q.notify({
+        message: `投递成功`,
+        color: "positive"
+      });
+      setTimeout(this.reset, 1250);
     }
   },
   created() {
     this.reset();
-  }
+  },
+  computed: {
+    imgAdd_inputIsVaild() {
+      return this.imgAdd_input.length != 0;
+    },
+    isSendable() {
+      return this.selected.length != 0;
+    }
+  },
+  watch: {}
 };
 </script>
 

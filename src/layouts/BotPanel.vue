@@ -4,7 +4,7 @@
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="left = !left" />
 
-        <q-toolbar-title>bot面板</q-toolbar-title>
+        <q-toolbar-title>bot控制台</q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -26,7 +26,7 @@ export default {
     };
   },
   async created() {
-    console.log(await this.$util.get("getDynamic"))
+    console.log(await this.$util.get("/cookieartbot/api/getDynamic"))
   },
   watch: {
     $route() {
