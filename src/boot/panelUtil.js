@@ -8,11 +8,11 @@ export default async ({ Vue }) => {
   class Util {
     constructor() {}
 
-    post(path, data = {}) {
+    post(path, data = {}, method = "post") {
       let token = LocalStorage.getItem("token");
 
       return axios({
-        method: "post",
+        method: method,
         url: `${path}`,
         data: data,
         responseType: "json",
@@ -23,11 +23,11 @@ export default async ({ Vue }) => {
       });
     }
 
-    get(path, params = {}) {
+    get(path, params = {}, method = "get") {
       let token = LocalStorage.getItem("token");
 
       return axios({
-        method: "get",
+        method: method,
         url: `${path}`,
         params: params,
         responseType: "json",

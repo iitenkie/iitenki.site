@@ -7,6 +7,8 @@
         :selected.sync="selected"
         row-key="objid"
         selection="multiple"
+        :pagination="{ rowsPerPage: 12 }"
+        :loading="loading"
       >
         <template v-slot:top>
           <q-checkbox
@@ -20,7 +22,7 @@
             @input="selectAll()"
             class="col-auto"
           />
-          <div class="col-2 q-table__title">静画</div>
+          <div class="col-2 q-table__title">存储</div>
           <q-space />
           <q-input v-model="imgAdd_input" label="图片ID" dense class="q-ma-xs">
             <template v-slot:append>
@@ -47,17 +49,12 @@
           <q-btn
             @click="itemAppend()"
             :disabled="!imgAdd_inputIsVaild"
-            :loading="loading"
             unelevated
             round
             class="q-ma-xs"
             color="positive"
             icon="add"
-          >
-            <template v-slot:loading>
-              <q-spinner-facebook />
-            </template>
-          </q-btn>
+          ></q-btn>
           <q-btn unelevated round class="q-ma-xs" color="primary" icon="send">
             <q-menu>
               <div class="q-pa-md q-gutter-y-sm">
@@ -73,43 +70,33 @@
                 <div>
                   <q-btn
                     @click="sendDynamic(selected)"
-                    :disabled="!isSendable || loading"
-                    :loading="loading"
+                    :disabled="!isSendable"
                     label="投递"
                     push
                     color="white"
                     text-color="primary"
                     style="width: 100%;"
-                  >
-                    <template v-slot:loading>
-                      <q-spinner-facebook />
-                    </template>
-                  </q-btn>
+                  ></q-btn>
                 </div>
               </div>
             </q-menu>
           </q-btn>
           <q-btn
             @click="deleteItem(selected)"
-            :disabled="!isSendable || loading"
-            :loading="loading"
+            :disabled="!isSendable"
             unelevated
             round
             class="q-ma-xs"
             color="red"
             icon="delete"
-          >
-            <template v-slot:loading>
-              <q-spinner-facebook />
-            </template>
-          </q-btn>
+          ></q-btn>
         </template>
         <template v-slot:item="props">
           <div class="col-xs-6 col-sm-6 col-md-4 q-pa-sm">
             <q-card>
               <div class="row">
                 <q-checkbox v-model="props.selected" class="col" />
-                <q-btn :disabled="loading" flat round icon="menu">
+                <q-btn flat round icon="menu">
                   <q-menu>
                     <q-list>
                       <q-item
@@ -125,6 +112,18 @@
                         v-close-popup
                       >
                         <q-item-section>删除</q-item-section>
+                      </q-item>
+                      <q-separator />
+                      <q-item
+                        @click="
+                          props.row.site == 'seiga'
+                            ? copyToClipboard(`im${props.row.id}`)
+                            : copyToClipboard(props.row.id)
+                        "
+                        clickable
+                        v-close-popup
+                      >
+                        <q-item-section>复制ID</q-item-section>
                       </q-item>
                     </q-list>
                   </q-menu>
@@ -169,10 +168,93 @@
             </q-card>
           </div>
         </template>
+        <template v-slot:loading>
+          <q-inner-loading showing>
+            <q-spinner-facebook size="50px" color="primary" />
+          </q-inner-loading>
+        </template>
       </q-table>
     </div>
     <div class="col-12 col-sm-6 col-md-5">
-      <q-card class="q-pa-md">placeholder</q-card>
+      <q-table
+        grid
+        :data="dynamics_data"
+        :selected.sync="selected_dynamic"
+        :row-key="row => row.desc.dynamic_id"
+        selection="multiple"
+        :pagination="{ rowsPerPage: 12 }"
+        :loading="loading_dynamic"
+      >
+        <template v-slot:top>
+          <div class="col-2 q-table__title">动态</div>
+          <q-space />
+          <q-btn
+            @click="dynamicReset()"
+            unelevated
+            round
+            class="q-ma-xs"
+            color="grey"
+            icon="refresh"
+          ></q-btn>
+          <q-btn
+            @click="deleteDynamic(selected_dynamic)"
+            unelevated
+            round
+            class="q-ma-xs"
+            color="red"
+            icon="delete"
+          ></q-btn>
+        </template>
+        <template v-slot:item="props">
+          <div class="col-xs-6 col-sm-6 col-md-4 q-pa-sm">
+            <q-card
+              :style="
+                isReviewing(props.row.extend_json) != false
+                  ? 'background-color: #fff1d3;'
+                  : 'background-color: white;'
+              "
+            >
+              <div class="row">
+                <q-checkbox v-model="props.selected" class="col" />
+                <q-btn
+                  @click="deleteDynamic(props.row)"
+                  flat
+                  round
+                  color="red"
+                  icon="delete"
+                ></q-btn>
+              </div>
+              <q-separator />
+              <a
+                :href="`https://h.bilibili.com/${props.row.desc.rid}`"
+                target="_blank"
+              >
+                <q-img
+                  :src="
+                    props.row.card.item.pictures[0].img_src.replace(
+                      /https:\/\/i0.hdslb.com/g,
+                      '/bilialbum'
+                    ) + '@240w_240h_1e_1c.webp'
+                  "
+                  ratio="1"
+                >
+                  <div
+                    class="absolute-bottom text-center"
+                    style="padding: 6px;"
+                  >
+                    {{ props.row.card.item.description.split("\n")[0] }}
+                  </div>
+                </q-img>
+              </a>
+            </q-card>
+          </div>
+        </template>
+        <template v-slot:loading>
+          <q-inner-loading showing>
+            <q-spinner-facebook size="50px" color="primary" />
+          </q-inner-loading>
+        </template>
+      </q-table>
     </div>
   </q-page>
 </template>
@@ -182,10 +264,12 @@ export default {
   name: "GetThumbnail",
   data() {
     return {
-      columns: [{ name: "id", label: "图片ID", field: "id" }],
       data: [],
+      dynamics_data: [],
       selected: [],
+      selected_dynamic: [],
       loading: false,
+      loading_dynamic: false,
       changeSite: 0,
       imgAdd_input: "",
       timing: false,
@@ -198,7 +282,7 @@ export default {
     async reset() {
       this.data = [];
       this.selected = [];
-      this.loading = false;
+      this.loading = true;
       let seigas = new this.$AV.Query("seigaList");
       let tweets = new this.$AV.Query("tweetList");
       let illusts = new this.$AV.Query("pixivList");
@@ -213,6 +297,7 @@ export default {
           this.data[child].objid = pics[child].id;
         }
       }
+      this.loading = false;
     },
     dbAppend(data) {
       if (data.site == "seiga") {
@@ -434,10 +519,57 @@ export default {
         color: "positive"
       });
       setTimeout(this.reset, 1250);
+    },
+    async copyToClipboard(text, is_webimage = false) {
+      if (!is_webimage) {
+        await navigator.clipboard.writeText(text);
+      }
+    },
+    async dynamicReset() {
+      this.loading_dynamic = true;
+      let ret = await this.$util.get("/cookieartbot/api/getDynamic");
+      this.dynamics_data = ret.data;
+      this.selected_dynamic = [];
+      this.loading_dynamic = false;
+    },
+    async deleteDynamic(items) {
+      this.loading_dynamic = true;
+      let deletes = [];
+      if (!Array.isArray(items)) {
+        items = [items];
+      }
+      for (let i of items) {
+        deletes.push(
+          this.$util.get("/cookieartbot/api/removeDynamic", {
+            iddym: i.desc.dynamic_id_str
+          })
+        );
+      }
+      this.$axios
+        .all(deletes)
+        .then(ret => {
+          this.dynamicReset();
+          this.loading_dynamic = false;
+        })
+        .catch(err => {
+          this.$q.notify({
+            message: `发生错误！\n${err}`,
+            color: "negative",
+            multiLine: true
+          });
+          this.dynamicReset();
+          this.loading_dynamic = false;
+        });
+    },
+    isReviewing(extend) {
+      if ("dispute" in extend) {
+        return extend.dispute.content;
+      } else return false;
     }
   },
   created() {
     this.reset();
+    this.dynamicReset();
   },
   computed: {
     imgAdd_inputIsVaild() {

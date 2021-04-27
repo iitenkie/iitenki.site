@@ -26,11 +26,14 @@ export default {
     };
   },
   async created() {
+    if (this.$q.localStorage.getItem("token") == null)
+      this.$router.push("/bot-panel/login");
     this.$axios.interceptors.response.use(
       response => {
         if (
           response.status == 401 &&
-          response.config.url != "/cookieartbot/login"
+          response.config.url != "/cookieartbot/login" &&
+          this.$route.path != "/bot-panel/login"
         )
           this.$router.push("/bot-panel/login");
         return response;
@@ -40,6 +43,6 @@ export default {
       }
     );
     await this.$util.get("/cookieartbot/islogin");
-  }
+  },
 };
 </script>
