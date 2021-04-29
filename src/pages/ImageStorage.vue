@@ -61,6 +61,53 @@
                 <div>
                   <q-checkbox v-model="timing" label="定时投递" />
                 </div>
+                <div v-if="timing">
+                  <q-btn
+                    @click="
+                      datetime_next = false;
+                      datetime_dialog = true;
+                    "
+                    :label="datetime == null ? '设定时间' : datetime"
+                    color="primary"
+                  >
+                    <q-dialog
+                      v-model="datetime_dialog"
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        v-if="!datetime_next"
+                        v-model="datetime"
+                        mask="YYYY-MM-DD HH:mm:00"
+                        :locale="zh_cn"
+                      >
+                        <div class="row items-center justify-end q-gutter-sm">
+                          <q-btn
+                            @click="datetime_next = true"
+                            label="NEXT"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                      <q-time
+                        v-else
+                        v-model="datetime"
+                        mask="YYYY-MM-DD HH:mm:00"
+                        format24h
+                      >
+                        <div class="row items-center justify-end q-gutter-sm">
+                          <q-btn
+                            @click="datetime_dialog = !datetime_dialog"
+                            label="OK"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-time>
+                    </q-dialog>
+                  </q-btn>
+                </div>
                 <div>
                   <q-checkbox v-model="forceReview" label="强制审核" />
                 </div>
@@ -71,6 +118,7 @@
                   <q-btn
                     @click="sendDynamic(selected)"
                     :disabled="!isSendable"
+                    v-close-popup
                     label="投递"
                     push
                     color="white"
@@ -275,7 +323,15 @@ export default {
       timing: false,
       forceReview: false,
       reSend: false,
-      datetime: "2000-01-01 00:00:00"
+      datetime: null,
+      datetime_dialog: false,
+      datetime_next: false,
+      zh_cn: {
+        days: '星期日_星期一_星期二_星期三_星期四_星期五_星期六'.split('_'),
+        daysShort: '日_一_二_三_四_五_六'.split('_'),
+        months: '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+        monthsShort: '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+      }
     };
   },
   methods: {
@@ -495,7 +551,7 @@ export default {
       }
       if (this.timing == true) {
         send.timing = true;
-        send.date = datetime;
+        send.date = this.datetime;
       } else {
         send.timing = false;
         send.date = null;
