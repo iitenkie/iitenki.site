@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LocalStorage } from "quasar";
 import AV from "leancloud-storage";
-import { date } from 'quasar'
+import { date } from "quasar";
 
 // "async" is optional;
 // more info on params: https://quasar.dev/quasar-cli/boot-files
@@ -37,6 +37,10 @@ export default async ({ Vue }) => {
           return status < 500;
         }
       });
+    }
+
+    reload() {
+      location.reload();
     }
   }
 

@@ -113,9 +113,11 @@ export default {
       let ret = await this.$util.get("/cookieartbot/webupdate");
       if (ret.data.code == 0) {
         this.$q.notify({
-          message: `更新完毕，请刷新页面`,
-          color: "positive"
+          message: `更新完毕`,
+          color: "positive",
+          position: "top"
         });
+        this.$util.reload();
       }
     }
   },

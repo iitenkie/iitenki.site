@@ -472,7 +472,8 @@ export default {
             this.$q.notify({
               message: `发生错误！\n${err}`,
               color: "negative",
-              multiLine: true
+              multiLine: true,
+              position: 'top'
             });
             this.loading = false;
           }
@@ -480,7 +481,8 @@ export default {
           this.$q.notify({
             message: `发生错误！\n${err}`,
             color: "negative",
-            multiLine: true
+            multiLine: true,
+            position: 'top'
           });
           this.loading = false;
         }
@@ -496,7 +498,8 @@ export default {
             this.$q.notify({
               message: `发生错误！\n${err}`,
               color: "negative",
-              multiLine: true
+              multiLine: true,
+              position: 'top'
             });
             this.loading = false;
           }
@@ -504,7 +507,8 @@ export default {
           this.$q.notify({
             message: `发生错误！\n${err}`,
             color: "negative",
-            multiLine: true
+            multiLine: true,
+            position: 'top'
           });
           this.loading = false;
         }
@@ -520,7 +524,8 @@ export default {
             this.$q.notify({
               message: `发生错误！\n${err}`,
               color: "negative",
-              multiLine: true
+              multiLine: true,
+              position: 'top'
             });
             this.loading = false;
           }
@@ -528,7 +533,8 @@ export default {
           this.$q.notify({
             message: `发生错误！\n${err}`,
             color: "negative",
-            multiLine: true
+            multiLine: true,
+            position: 'top'
           });
           this.loading = false;
         }
@@ -599,7 +605,8 @@ export default {
       }
       this.$q.notify({
         message: `投递成功`,
-        color: "positive"
+        color: "positive",
+        position: 'top'
       });
       setTimeout(this.reset, 1250);
     },
@@ -642,7 +649,8 @@ export default {
           this.$q.notify({
             message: `发生错误！\n${err}`,
             color: "negative",
-            multiLine: true
+            multiLine: true,
+            position: 'top'
           });
           this.dynamicReset();
           this.loading_dynamic = false;
