@@ -3,7 +3,6 @@
     <q-header elevated class="bg-primary text-white">
       <q-toolbar>
         <q-toolbar-title>
-          bot控制台
           <q-checkbox
             v-if="!islogin"
             :value="bilistat"
