@@ -2,7 +2,35 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-primary text-white">
       <q-toolbar>
-        <q-toolbar-title>bot控制台</q-toolbar-title>
+        <q-toolbar-title>
+          bot控制台
+          <q-checkbox
+            v-if="!islogin"
+            :value="bilistat"
+            label="bili"
+            :color="
+              bilistat == true
+                ? 'positive'
+                : bilistat == null
+                ? 'grey'
+                : 'negative'
+            "
+            keep-color
+          />
+          <q-checkbox
+            v-if="!islogin"
+            :value="nicostat"
+            label="nico"
+            :color="
+              nicostat == true
+                ? 'positive'
+                : nicostat == null
+                ? 'grey'
+                : 'negative'
+            "
+            keep-color
+          />
+        </q-toolbar-title>
 
         <q-btn dense flat round icon="menu" @click="right = !right" />
       </q-toolbar>
@@ -10,20 +38,30 @@
 
     <q-drawer v-if="!islogin" v-model="right" side="right" bordered>
       <div class="q-ma-sm">
-        <q-btn
-          @click="notifyReset"
-          :loading="loading"
-          unelevated
-          round
-          class="q-ma-xs"
-          color="grey"
-          icon="refresh"
+        <div class="row items-center">
+          <div class="col q-table__title q-ml-sm">系统消息</div>
+          <q-space />
+          <q-btn
+            @click="notifyReset"
+            :loading="loading"
+            unelevated
+            round
+            class="col-auto q-ma-xs"
+            color="grey"
+            icon="refresh"
+          >
+            <template v-slot:loading>
+              <q-spinner-facebook />
+            </template>
+          </q-btn>
+        </div>
+        <q-card
+          v-for="(item, i) in notifys"
+          :key="i"
+          class="q-my-sm q-pa-sm"
+          flat
+          bordered
         >
-          <template v-slot:loading>
-            <q-spinner-facebook />
-          </template>
-        </q-btn>
-        <q-card v-for="(item, i) in notifys" :key="i" class="q-my-sm q-pa-sm">
           <div class="q-mb-xs text-body2 text-grey-7">{{ item.time_at }}</div>
           <div class="text-body2">{{ item.content.split("。")[0] }}</div>
         </q-card>
@@ -42,7 +80,9 @@ export default {
       right: true,
       notifys: [],
       loading: false,
-      islogin: false
+      islogin: false,
+      bilistat: null,
+      nicostat: null
     };
   },
   methods: {
@@ -53,10 +93,10 @@ export default {
       this.loading = false;
     },
     async routeChange(n) {
-      await this.$util.get("/cookieartbot/islogin");
       if (n.path == "/bot-panel/login") {
         this.islogin = true;
       } else this.islogin = false;
+      await this.$util.get("/cookieartbot/islogin");
     }
   },
   watch: {
@@ -89,6 +129,9 @@ export default {
     );
     this.routeChange(this.$route);
     await this.notifyReset();
+    let ret = await this.$util.get("/cookieartbot/loginstat");
+    this.bilistat = ret.data.data.bilibili;
+    this.nicostat = ret.data.data.niconico;
   }
 };
 </script>

@@ -141,7 +141,7 @@
         </template>
         <template v-slot:item="props">
           <div class="col-xs-6 col-sm-6 col-md-4 q-pa-sm">
-            <q-card>
+            <q-card flat bordered>
               <div class="row">
                 <q-checkbox v-model="props.selected" class="col" />
                 <q-btn flat round icon="menu">
@@ -261,16 +261,25 @@
                   ? 'background-color: #fff1d3;'
                   : 'background-color: white;'
               "
+              flat
+              bordered
             >
               <div class="row">
                 <q-checkbox v-model="props.selected" class="col" />
-                <q-btn
-                  @click="deleteDynamic(props.row)"
-                  flat
-                  round
-                  color="red"
-                  icon="delete"
-                ></q-btn>
+                <q-btn flat round icon="menu">
+                  <q-menu>
+                    <q-list>
+                      <q-item
+                        @click="deleteDynamic(props.row)"
+                        class="text-red"
+                        clickable
+                        v-close-popup
+                      >
+                        <q-item-section>删除</q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
               </div>
               <q-separator />
               <a
@@ -290,7 +299,21 @@
                     class="absolute-bottom text-center"
                     style="padding: 6px;"
                   >
-                    {{ props.row.card.item.description.split("\n")[0] }}
+                    <span>
+                      <q-icon class="q-mr-xs" name="reply" size="xs" />{{
+                        props.row.desc.repost
+                      }}
+                    </span>
+                    <span class="q-mx-xs">
+                      <q-icon class="q-mr-xs" name="comment" size="xs" />{{
+                        props.row.desc.comment
+                      }}
+                    </span>
+                    <span>
+                      <q-icon class="q-mr-xs" name="thumb_up" size="xs" />{{
+                        props.row.desc.like
+                      }}
+                    </span>
                   </div>
                 </q-img>
               </a>
@@ -327,10 +350,14 @@ export default {
       datetime_dialog: false,
       datetime_next: false,
       zh_cn: {
-        days: '星期日_星期一_星期二_星期三_星期四_星期五_星期六'.split('_'),
-        daysShort: '日_一_二_三_四_五_六'.split('_'),
-        months: '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
-        monthsShort: '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+        days: "星期日_星期一_星期二_星期三_星期四_星期五_星期六".split("_"),
+        daysShort: "日_一_二_三_四_五_六".split("_"),
+        months: "一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月".split(
+          "_"
+        ),
+        monthsShort: "一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月".split(
+          "_"
+        )
       }
     };
   },
@@ -596,9 +623,13 @@ export default {
       }
       for (let i of items) {
         deletes.push(
-          this.$util.get("/cookieartbot/api/removeDynamic", {
-            iddym: i.desc.dynamic_id_str
-          })
+          this.$util.get(
+            "/cookieartbot/api/removeDynamic",
+            {
+              iddym: i.desc.dynamic_id_str
+            },
+            "delete"
+          )
         );
       }
       this.$axios
@@ -627,6 +658,7 @@ export default {
     this.reset();
     this.dynamicReset();
   },
+  mounted() {},
   computed: {
     imgAdd_inputIsVaild() {
       return this.imgAdd_input.length != 0;
