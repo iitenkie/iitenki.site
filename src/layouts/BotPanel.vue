@@ -29,7 +29,9 @@
             "
             keep-color
           />
-          当前账号: {{ uname }}
+          <span v-if="!islogin" class="text-caption"
+            >当前账号: {{ uname }}
+          </span>
         </q-toolbar-title>
 
         <q-btn dense flat round icon="menu" @click="right = !right" />
