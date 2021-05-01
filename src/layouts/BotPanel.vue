@@ -30,6 +30,7 @@
             "
             keep-color
           />
+          当前账号: {{ uname }}
         </q-toolbar-title>
 
         <q-btn dense flat round icon="menu" @click="right = !right" />
@@ -82,7 +83,8 @@ export default {
       loading: false,
       islogin: false,
       bilistat: null,
-      nicostat: null
+      nicostat: null,
+      uname: ""
     };
   },
   methods: {
@@ -132,6 +134,7 @@ export default {
     let ret = await this.$util.get("/cookieartbot/loginstat");
     this.bilistat = ret.data.data.bilibili;
     this.nicostat = ret.data.data.niconico;
+    this.uname = ret.data.data.bilibili_uname;
   }
 };
 </script>
