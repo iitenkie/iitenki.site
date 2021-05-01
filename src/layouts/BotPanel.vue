@@ -56,6 +56,14 @@
               <q-spinner-facebook />
             </template>
           </q-btn>
+          <q-btn
+            @click="webUpdate"
+            unelevated
+            round
+            class="col-auto q-ma-xs"
+            color="warning"
+            icon="update"
+          />
         </div>
         <q-card
           v-for="(item, i) in notifys"
@@ -100,6 +108,15 @@ export default {
         this.islogin = true;
       } else this.islogin = false;
       await this.$util.get("/cookieartbot/islogin");
+    },
+    async webUpdate() {
+      let ret = await this.$util.get("/cookieartbot/webupdate");
+      if (ret.data.code == 0) {
+        this.$q.notify({
+          message: `更新完毕，请刷新页面`,
+          color: "positive"
+        });
+      }
     }
   },
   watch: {
