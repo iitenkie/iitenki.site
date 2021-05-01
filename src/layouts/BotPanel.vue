@@ -29,8 +29,8 @@
             "
             keep-color
           />
-          <span v-if="!islogin" class="text-caption"
-            >当前账号: {{ uname }}
+          <span v-if="!islogin" class="q-ml-xs text-body1">
+            当前账号: {{ uname }}
           </span>
         </q-toolbar-title>
 
