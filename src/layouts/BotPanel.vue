@@ -30,7 +30,7 @@
             keep-color
           />
           <span v-if="!islogin" class="q-ml-xs text-body1">
-            当前账号: {{ uname }}
+            @{{ uname }}
           </span>
         </q-toolbar-title>
 
