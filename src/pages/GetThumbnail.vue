@@ -71,7 +71,7 @@ export default {
         this.loading = true;
         this.error = false;
         Jimp.read(
-          "https://iitenki.site/api/getNicoThumbnailForward?smid=" + this.smid
+          "https://iitenki.site/ajax/getNicoThumbnailForward?smid=" + this.smid
         )
           .then(result => {
             result.getBase64(Jimp.MIME_JPEG, (err, src) => {
