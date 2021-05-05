@@ -118,6 +118,7 @@ module.exports = function (/* ctx */) {
         'Meta',
         'LocalStorage',
         'Notify',
+        'Dialog'
       ]
     },
 
