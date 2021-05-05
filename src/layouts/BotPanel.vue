@@ -29,9 +29,7 @@
             "
             keep-color
           />
-          <span v-if="!islogin" class="q-ml-xs text-body1">
-            @{{ uname }}
-          </span>
+          <span v-if="!islogin" class="q-ml-xs text-body1"> @{{ uname }} </span>
         </q-toolbar-title>
 
         <q-btn dense flat round icon="menu" @click="right = !right" />
@@ -109,16 +107,24 @@ export default {
       } else this.islogin = false;
       await this.$util.get("/cookieartbot/islogin");
     },
-    async webUpdate() {
-      let ret = await this.$util.get("/cookieartbot/webupdate");
-      if (ret.data.code == 0) {
-        this.$q.notify({
-          message: `更新完毕`,
-          color: "positive",
-          position: "top"
+    webUpdate() {
+      this.$q
+        .dialog({
+          title: "确认",
+          message: "是否更新？",
+          cancel: true
+        })
+        .onOk(async () => {
+          let ret = await this.$util.get("/cookieartbot/webupdate");
+          if (ret.data.code == 0) {
+            this.$q.notify({
+              message: `更新完毕`,
+              color: "positive",
+              position: "top"
+            });
+            this.$util.reload();
+          }
         });
-        this.$util.reload();
-      }
     }
   },
   watch: {
