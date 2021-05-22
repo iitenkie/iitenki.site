@@ -29,7 +29,7 @@
             "
             keep-color
           />
-          <span v-if="!islogin" class="q-ml-xs text-body1"> @{{ uname }} </span>
+          <a v-if="!islogin" :href="`https://space.bilibili.com/${buid}/dynamic`" class="q-ml-xs text-body1"> @{{ buname }} </a>
         </q-toolbar-title>
 
         <q-btn dense flat round icon="menu" @click="right = !right" />
@@ -91,7 +91,8 @@ export default {
       islogin: false,
       bilistat: null,
       nicostat: null,
-      uname: ""
+      buname: "",
+      buid: null
     };
   },
   methods: {
@@ -160,7 +161,8 @@ export default {
     let ret = await this.$util.get("/cookieartbot/loginstat");
     this.bilistat = ret.data.data.bilibili;
     this.nicostat = ret.data.data.niconico;
-    this.uname = ret.data.data.bilibili_uname;
+    this.buname = ret.data.data.bilibili_uname;
+    this.buid = ret.data.data.bilibili_uid;
   }
 };
 </script>
