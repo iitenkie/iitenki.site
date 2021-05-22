@@ -29,7 +29,14 @@
             "
             keep-color
           />
-          <a v-if="!islogin" :href="`https://space.bilibili.com/${buid}/dynamic`" class="q-ml-xs text-body1"> @{{ buname }} </a>
+          <a
+            v-if="!islogin"
+            :href="`https://space.bilibili.com/${buid}/dynamic`"
+            target="_blank"
+            class="q-ml-xs text-body1 bspace"
+          >
+            @{{ buname }}
+          </a>
         </q-toolbar-title>
 
         <q-btn dense flat round icon="menu" @click="right = !right" />
@@ -166,3 +173,12 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.bspace:link {
+  color: white;
+}
+.bspace:visited {
+  color: white;
+}
+</style>
