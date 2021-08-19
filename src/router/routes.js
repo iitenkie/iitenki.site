@@ -28,6 +28,10 @@ const routes = [
       }
     ]
   },
+  {
+    path: "/ranking-config-maker",
+    component: () => import("pages/RankingConfigMaker.vue")
+  },
 
   // Always leave this as last one,
   // but you can also remove it
