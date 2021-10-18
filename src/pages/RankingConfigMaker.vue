@@ -18,8 +18,16 @@
               v-if="file"
               :disable="dlfile == null"
               outline
+              class="q-mr-sm"
             >
               保存
+            </q-btn>
+            <q-btn
+              @click="saveConf"
+              v-if="file"
+              outline
+            >
+              保存配置文件
             </q-btn>
           </template>
         </q-file>
@@ -117,6 +125,9 @@ export default {
     },
     filedl() {
       saveAs(this.dlfile, this.file.name.replace(".json", ".zip"));
+    },
+    saveConf() {
+      saveAs(JSON.stringify(this.data), this.file.name)
     }
   },
   watch: {
