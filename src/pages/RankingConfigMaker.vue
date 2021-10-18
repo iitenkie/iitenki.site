@@ -127,7 +127,8 @@ export default {
       saveAs(this.dlfile, this.file.name.replace(".json", ".zip"));
     },
     saveConf() {
-      saveAs(JSON.stringify(this.data), this.file.name)
+      let blob = new Blob([JSON.stringify(this.data)], {type: "application/json;charset=utf-8"});
+      saveAs(blob, this.file.name)
     }
   },
   watch: {
