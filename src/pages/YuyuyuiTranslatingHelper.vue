@@ -30,7 +30,7 @@
 
     <q-drawer show-if-above v-model="right" side="right" bordered>
       <q-list padding class="rounded-borders text-pink-6">
-        <div class="row q-pa-sm q-ma-xs q-gutter-sm rounded-borders">
+        <div class="row q-pa-sm q-ma-xs rounded-borders">
           文本
           <q-space />
           <q-btn
@@ -38,6 +38,7 @@
             color="pink-11"
             icon="add"
             @click="text_add_click()"
+            class="q-px-sm"
             flat
           />
           <q-btn
@@ -45,6 +46,7 @@
             color="pink-11"
             icon="ios_share"
             @click="save_conf()"
+            class="q-px-sm"
             flat
           />
           <input
