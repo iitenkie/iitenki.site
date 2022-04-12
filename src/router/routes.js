@@ -29,8 +29,12 @@ const routes = [
     ]
   },
   {
-    path: "/ranking-config-maker",
-    component: () => import("pages/RankingConfigMaker.vue")
+    path: "/yuyuyui-translating-helper",
+    component: () => import("pages/YuyuyuiTranslatingHelper.vue")
+  },
+  {
+    path: "/yushadearu-logo-generator",
+    component: () => import("pages/YushadearuLogoGenerator.vue")
   },
 
   // Always leave this as last one,

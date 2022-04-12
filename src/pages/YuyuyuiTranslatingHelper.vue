@@ -1,0 +1,416 @@
+<template>
+  <q-layout view="hHr lpR fFr">
+    <q-header bordered class="bg-pink-11 text-white">
+      <q-toolbar>
+        <q-toolbar-title>
+          ゆゆゆい烤肉助手
+        </q-toolbar-title>
+
+        <q-btn dense flat round icon="menu" @click="right = !right" />
+      </q-toolbar>
+    </q-header>
+
+    <q-drawer show-if-above v-model="right" side="right" bordered>
+      <q-list bordered>
+        <q-expansion-item expand-separator icon="description" label="文本">
+          <div class="row q-py-sm q-px-md">
+            <q-space />
+            <q-btn
+              padding="none"
+              color="pink"
+              icon="add"
+              @click="$refs.file.click()"
+              flat
+            />
+            <input type="file" ref="file" style="display: none" @change="add" />
+          </div>
+          <q-card
+            v-for="(item, i) in text_list"
+            :key="i"
+            class="q-ma-xs"
+            bordered
+          >
+            <q-card-section class="row">
+              {{ item.title }}
+              <q-space />
+              <q-radio v-model="text_select" :val="i" dense />
+            </q-card-section>
+          </q-card>
+          <div class="flex flex-center">
+            <q-pagination
+              v-model="page"
+              :max="Math.ceil(this.text_count / limit)"
+              input
+            />
+          </div>
+          <q-inner-loading :showing="text_list.length == 0 && !loaded">
+            <q-spinner-bars size="50px" color="pink" />
+          </q-inner-loading>
+        </q-expansion-item>
+        <q-expansion-item expand-separator icon="book" label="词典">
+          <q-card v-for="(item, i) in dicts" :key="i" class="q-ma-xs" bordered>
+            <q-card-section class="row">
+              {{ item.name }}
+              <q-space />
+            </q-card-section>
+          </q-card>
+          <q-inner-loading :showing="dicts.length == 0 && !loaded">
+            <q-spinner-bars size="50px" color="pink" />
+          </q-inner-loading>
+        </q-expansion-item>
+      </q-list>
+    </q-drawer>
+
+    <q-page-container>
+      <q-page class="flex flex-center row" padding>
+        <div class="col-xs-12 col-sm-8 col-md-6 col-xl-4">
+          <div v-for="(item, i) in data.text" :key="i" class="q-pb-sm">
+            <q-card v-if="item.type == 'text'" flat bordered>
+              <div class="row q-px-md q-py-xs bg-pink-1">
+                <div>
+                  {{ item.speaker }}
+                  <q-btn
+                    @click="
+                      item.roasted_speaker = speaker_replace(item.speaker)
+                    "
+                    color="primary"
+                    icon="update"
+                    size="xs"
+                    flat
+                    round
+                  />
+                  <div
+                    :class="
+                      'cursor-pointer text-caption' +
+                        (item.roasted_speaker
+                          ? ' text-grey'
+                          : ' text-negative text-bold')
+                    "
+                  >
+                    {{
+                      item.roasted_speaker
+                        ? item.roasted_speaker
+                        : "人名（中文）"
+                    }}
+                    <q-popup-edit v-model="item.roasted_speaker" auto-save>
+                      <q-input v-model="item.roasted_speaker" dense autofocus />
+                    </q-popup-edit>
+                  </div>
+                </div>
+                <q-space />
+                {{ item.speaker_skin }}
+              </div>
+              <q-card-section class="q-pt-xs">
+                <q-field color="orange" placeholder="原文" readonly autogrow>
+                  <template v-slot:control>
+                    <div
+                      v-html="item.text"
+                      style="white-space: pre-line;"
+                    ></div>
+                  </template>
+                </q-field>
+                <q-input
+                  v-model="item.roasted_text"
+                  type="textarea"
+                  color="pink"
+                  placeholder="译文"
+                  autogrow
+                />
+                <q-input
+                  v-model="item.comment"
+                  type="text"
+                  color="pink"
+                  placeholder="备注"
+                  dense
+                  autogrow
+                />
+              </q-card-section>
+            </q-card>
+            <q-card
+              v-else-if="item.type == 'location'"
+              v-text="item.name"
+              flat
+              bordered
+              dense
+              class="bg-pink-1 text-h6 q-pa-sm"
+              style="text-align: center;"
+            >
+            </q-card>
+            <q-chip v-else>
+              <q-avatar
+                v-if="item.type == 'bgm'"
+                icon="music_note"
+                color="red"
+                text-color="white"
+              />
+              <q-avatar
+                v-else-if="item.type == 'se'"
+                icon="volume_up"
+                color="red"
+                text-color="white"
+              />
+              {{ item.name }}
+            </q-chip>
+          </div>
+        </div>
+
+        <q-page-sticky position="bottom-right" :offset="[18, 18]">
+          <q-btn
+            :label="`${diff_num}:保存`"
+            size="lg"
+            class="bg_transition"
+            @click="update()"
+            :color="diff_num == 0 ? 'positive' : 'negative'"
+            rounded
+          />
+        </q-page-sticky>
+
+        <q-inner-loading :showing="data.text.length == 0 && !loaded">
+          <q-spinner-bars size="50px" color="pink" />
+        </q-inner-loading>
+      </q-page>
+    </q-page-container>
+  </q-layout>
+</template>
+
+<script>
+export default {
+  name: "YuyuyuiTranslationHelper",
+  data() {
+    return {
+      last_updated: null,
+      loaded: false,
+      text_list: [],
+      text_select: 0,
+      text_count: 0,
+      dicts: [],
+      data: { text: [] },
+      diff_num: 0,
+      update_flag: false,
+      right: false,
+      limit: 20,
+      page: 1
+    };
+  },
+  watch: {
+    async page(val) {
+      let resp = await this.get("/cookieartbot/yyyi/records", {
+        limit: this.limit,
+        skip: (this.page - 1) * this.limit,
+        projection: JSON.stringify({ text: 0 })
+      });
+      this.text_list = resp.data.data;
+    },
+    async text_select(val) {
+      this.data = this.text_list[val];
+    },
+    data: {
+      deep: true,
+      handler(_, old_val) {
+        if (!this.update_flag && old_val.text.length != 0) {
+          this.update_flag = true;
+          setTimeout(async () => {
+            let data_old_raw = await this.get("/cookieartbot/yyyi/records", {
+              query: JSON.stringify({ _id: this.data._id })
+            });
+            let data_old = data_old_raw.data.data[0];
+
+            if (
+              data_old.last_modified > this.last_updated &&
+              this.last_updated != null
+            ) {
+              location.reload();
+            }
+
+            let diff_num = 0;
+            for (const i in this.data) {
+              if (i != "text") {
+                if (this.data[i] != data_old[i]) {
+                  diff_num++;
+                }
+              } else {
+                for (const ii in this.data[i]) {
+                  for (const iii in this.data[i][ii]) {
+                    if (this.data[i][ii][iii] != data_old[i][ii][iii]) {
+                      diff_num++;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+            this.diff_num = diff_num;
+
+            this.update_flag = false;
+          }, 2500);
+        }
+      }
+    },
+    diff_num(val) {
+      if (val > 0) this.update();
+    }
+  },
+  methods: {
+    add(el) {
+      let file = el.target.files[0];
+      let reader = new FileReader();
+      reader.onload = async () => {
+        let dat = this.yuyuyui_script_serialize(reader.result);
+        await this.post("/cookieartbot/yyyi/add", {
+          title: file.name,
+          text: dat
+        });
+        await this.reset();
+      };
+      reader.readAsText(file);
+    },
+    get(url, params = {}) {
+      return this.$axios({
+        method: "get",
+        url: url,
+        responseType: "json",
+        params: params
+      });
+    },
+    post(url, data) {
+      return this.$axios({
+        method: "post",
+        url: url,
+        responseType: "json",
+        data: data
+      });
+    },
+    yuyuyui_script_serialize(text) {
+      function size_replace(a, p1, p2, b, c) {
+        return `<span style="font-size: ${Math.round((p1 / 48) * 100) /
+          100}em;">${p2}</span>`;
+      }
+
+      text = text.split("\r\n");
+      let data = [];
+      let id = 1;
+      for (let i = 0; i < text.length; i++) {
+        let el = text[i];
+
+        if (/^.*    <.*>$/.test(el)) {
+          i++;
+          let extract = el.match(/^(.*)    <(.*)>$/);
+
+          let form = {
+            _id: id,
+            type: "text",
+            speaker: extract[1],
+            speaker_skin: extract[2],
+            roasted_speaker: "",
+            text: "",
+            roasted_text: "",
+            comment: ""
+          };
+
+          let _text = [];
+          for (; text[i]; i++) _text.push(text[i].slice(4));
+
+          form.text = _text.join("\n");
+          form.text = form.text.replace(/@s\((\d+)\)\{(.+)\}/g, size_replace);
+          form.text = form.text.replace(
+            /@c\((.+)\)\{(.+)\}/g,
+            '<span style="color: $1;">$2</span>'
+          );
+          form.text = form.text.replace(/@b\{(.+)\}/g, "<b>$1</b>");
+
+          data.push(form);
+          id++;
+        } else if (/^BGM: .*$/.test(el)) {
+          let extract = el.match(/^BGM: (.*$)/);
+          let form = {
+            _id: id,
+            type: "bgm",
+            name: extract[1]
+          };
+          data.push(form);
+          id++;
+        } else if (/^SE: .*$/.test(el)) {
+          let extract = el.match(/^SE: (.*$)/);
+          let form = {
+            _id: id,
+            type: "se",
+            name: extract[1]
+          };
+          data.push(form);
+          id++;
+        } else if (/^■■■.*■■■$/.test(el)) {
+          let extract = el.match(/^■■■(.*)■■■$/);
+          let form = {
+            _id: id,
+            type: "location",
+            name: extract[1]
+          };
+          data.push(form);
+          id++;
+        } else continue;
+      }
+
+      return data;
+    },
+    async reset() {
+      let requests = [
+        this.get("/cookieartbot/yyyi/records", {
+          limit: this.limit,
+          skip: (this.page - 1) * this.limit
+        }),
+        this.get("/cookieartbot/yyyi/records_count"),
+        this.get("/cookieartbot/yyyi/dicts")
+      ];
+      let resp = await Promise.all(requests);
+      this.text_list = resp[0].data.data;
+      this.data =
+        this.text_select in this.text_list
+          ? this.text_list[this.text_select]
+          : { text: [] };
+      this.text_count = resp[1].data.count;
+      this.dicts = resp[2].data.data;
+      this.loaded = true;
+    },
+    speaker_replace(speaker) {
+      return this.all_entries[speaker] ? this.all_entries[speaker] : "";
+    },
+    async update() {
+      let res = await this.post("/cookieartbot/yyyi/update", {
+        query: { _id: this.data._id },
+        data: this.data
+      });
+      if (res.status == 200) {
+        this.diff_num = 0;
+        this.last_updated = this.data.last_modified = this.now_timestamp();
+      } else {
+        this.$q.notify({
+          message: `保存失败，请检查`,
+          color: "negative",
+          position: "top"
+        });
+      }
+    },
+    now_timestamp() {
+      return Math.round(Date.now() / 1000);
+    }
+  },
+  computed: {
+    all_entries() {
+      let dicts = {};
+      for (let i of this.dicts) {
+        dicts = { ...dicts, ...i.entries };
+      }
+      return dicts;
+    }
+  },
+  async created() {
+    await this.reset();
+  }
+};
+</script>
+
+<style>
+.bg_transition {
+  transition: background 0.5s;
+}
+</style>
