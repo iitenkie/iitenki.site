@@ -38,7 +38,7 @@
             color="pink-11"
             icon="add"
             @click="text_add_click()"
-            class="q-px-sm"
+            class="q-mx-sm"
             flat
           />
           <q-btn
@@ -46,7 +46,7 @@
             color="pink-11"
             icon="ios_share"
             @click="save_conf()"
-            class="q-px-sm"
+            class="q-mx-sm"
             flat
           />
           <input
