@@ -1,59 +1,103 @@
 <template>
-  <q-layout view="hHr lpR fFr">
+  <q-layout view="hHh lpR fFr">
     <q-header bordered class="bg-pink-11 text-white">
       <q-toolbar>
         <q-toolbar-title>
-          ゆゆゆい烤肉助手
+          云烤肉
         </q-toolbar-title>
 
         <q-btn dense flat round icon="menu" @click="right = !right" />
       </q-toolbar>
+      <q-bar class="bg-pink-1 text-black">
+        <div class="cursor-pointer">
+          {{ data.title }}
+          <q-popup-edit v-model="data.title" auto-save>
+            <q-input v-model="data.title" debounce="1000" dense autofocus />
+          </q-popup-edit>
+        </div>
+
+        <div
+          class="ellipsis cursor-pointer text-italic"
+          style="font-size: 0.85rem;"
+        >
+          {{ data.comment ? data.comment : "备注" }}
+          <q-popup-edit v-model="data.comment" auto-save>
+            <q-input v-model="data.comment" debounce="1000" dense autofocus />
+          </q-popup-edit>
+        </div>
+      </q-bar>
     </q-header>
 
     <q-drawer show-if-above v-model="right" side="right" bordered>
-      <q-list bordered>
-        <q-expansion-item expand-separator icon="description" label="文本">
-          <div class="row q-py-sm q-px-md">
-            <q-space />
-            <q-btn
-              padding="none"
-              color="pink"
-              icon="add"
-              @click="$refs.file.click()"
-              flat
-            />
-            <input type="file" ref="file" style="display: none" @change="add" />
-          </div>
-          <q-card
-            v-for="(item, i) in text_list"
+      <q-list padding class="rounded-borders text-pink-6">
+        <div class="row q-pa-sm q-ma-xs q-gutter-sm rounded-borders">
+          文本
+          <q-space />
+          <q-btn
+            padding="none"
+            color="pink-11"
+            icon="add"
+            @click="text_add_click()"
+            flat
+          />
+          <q-btn
+            padding="none"
+            color="pink-11"
+            icon="ios_share"
+            @click="save_conf()"
+            flat
+          />
+          <input
+            type="file"
+            ref="file"
+            style="display: none"
+            @change="add()"
+            accept="text/*"
+          />
+        </div>
+
+        <q-item
+          v-for="(item, i) in text_list"
+          :key="i"
+          clickable
+          v-ripple
+          :active="text_select === i"
+          @click="text_select = i"
+          active-class="menu_active"
+          class="q-ma-xs rounded-borders"
+        >
+          <q-item-section>
+            {{ item.title }}
+          </q-item-section>
+        </q-item>
+
+        <div class="flex flex-center">
+          <q-pagination
+            v-model="page"
+            :max="Math.ceil(this.text_count / limit)"
+            input
+            color="pink-11"
+          />
+        </div>
+
+        <q-inner-loading :showing="text_list.length == 0 && !loaded">
+          <q-spinner-bars size="50px" color="pink" />
+        </q-inner-loading>
+
+        <q-separator />
+
+        <q-expansion-item expand-separator label="词典">
+          <q-item
+            v-for="(item, i) in dicts"
             :key="i"
+            clickable
+            v-ripple
             class="q-ma-xs"
-            bordered
           >
-            <q-card-section class="row">
-              {{ item.title }}
-              <q-space />
-              <q-radio v-model="text_select" :val="i" dense />
-            </q-card-section>
-          </q-card>
-          <div class="flex flex-center">
-            <q-pagination
-              v-model="page"
-              :max="Math.ceil(this.text_count / limit)"
-              input
-            />
-          </div>
-          <q-inner-loading :showing="text_list.length == 0 && !loaded">
-            <q-spinner-bars size="50px" color="pink" />
-          </q-inner-loading>
-        </q-expansion-item>
-        <q-expansion-item expand-separator icon="book" label="词典">
-          <q-card v-for="(item, i) in dicts" :key="i" class="q-ma-xs" bordered>
-            <q-card-section class="row">
+            <q-item-section class="row">
               {{ item.name }}
-              <q-space />
-            </q-card-section>
-          </q-card>
+            </q-item-section>
+          </q-item>
           <q-inner-loading :showing="dicts.length == 0 && !loaded">
             <q-spinner-bars size="50px" color="pink" />
           </q-inner-loading>
@@ -90,16 +134,22 @@
                     {{
                       item.roasted_speaker
                         ? item.roasted_speaker
-                        : "人名（中文）"
+                        : "角色名（中文）"
                     }}
                     <q-popup-edit v-model="item.roasted_speaker" auto-save>
-                      <q-input v-model="item.roasted_speaker" dense autofocus />
+                      <q-input
+                        v-model="item.roasted_speaker"
+                        debounce="1000"
+                        dense
+                        autofocus
+                      />
                     </q-popup-edit>
                   </div>
                 </div>
                 <q-space />
                 {{ item.speaker_skin }}
               </div>
+
               <q-card-section class="q-pt-xs">
                 <q-field color="orange" placeholder="原文" readonly autogrow>
                   <template v-slot:control>
@@ -111,6 +161,7 @@
                 </q-field>
                 <q-input
                   v-model="item.roasted_text"
+                  debounce="500"
                   type="textarea"
                   color="pink"
                   placeholder="译文"
@@ -118,6 +169,7 @@
                 />
                 <q-input
                   v-model="item.comment"
+                  debounce="500"
                   type="text"
                   color="pink"
                   placeholder="备注"
@@ -126,6 +178,7 @@
                 />
               </q-card-section>
             </q-card>
+
             <q-card
               v-else-if="item.type == 'location'"
               v-text="item.name"
@@ -136,6 +189,7 @@
               style="text-align: center;"
             >
             </q-card>
+
             <q-chip v-else>
               <q-avatar
                 v-if="item.type == 'bgm'"
@@ -174,6 +228,8 @@
 </template>
 
 <script>
+import { saveAs } from "file-saver";
+
 export default {
   name: "YuyuyuiTranslationHelper",
   data() {
@@ -206,43 +262,45 @@ export default {
     },
     data: {
       deep: true,
-      handler(_, old_val) {
-        if (!this.update_flag && old_val.text.length != 0) {
-          this.update_flag = true;
-          setTimeout(async () => {
-            let data_old_raw = await this.get("/cookieartbot/yyyi/records", {
-              query: JSON.stringify({ _id: this.data._id })
-            });
-            let data_old = data_old_raw.data.data[0];
+      handler(val, old_val) {
+        if (val._id == old_val._id) {
+          if (!this.update_flag && old_val.text.length != 0) {
+            this.update_flag = true;
+            setTimeout(async () => {
+              let data_old_raw = await this.get("/cookieartbot/yyyi/records", {
+                query: JSON.stringify({ _id: this.data._id })
+              });
+              let data_old = data_old_raw.data.data[0];
 
-            if (
-              data_old.last_modified > this.last_updated &&
-              this.last_updated != null
-            ) {
-              location.reload();
-            }
+              if (
+                data_old.last_modified > this.last_updated &&
+                this.last_updated != null
+              ) {
+                location.reload();
+              }
 
-            let diff_num = 0;
-            for (const i in this.data) {
-              if (i != "text") {
-                if (this.data[i] != data_old[i]) {
-                  diff_num++;
-                }
-              } else {
-                for (const ii in this.data[i]) {
-                  for (const iii in this.data[i][ii]) {
-                    if (this.data[i][ii][iii] != data_old[i][ii][iii]) {
-                      diff_num++;
-                      break;
+              let diff_num = 0;
+              for (const i in this.data) {
+                if (i != "text") {
+                  if (this.data[i] != data_old[i]) {
+                    diff_num++;
+                  }
+                } else {
+                  for (const ii in this.data[i]) {
+                    for (const iii in this.data[i][ii]) {
+                      if (this.data[i][ii][iii] != data_old[i][ii][iii]) {
+                        diff_num++;
+                        break;
+                      }
                     }
                   }
                 }
               }
-            }
-            this.diff_num = diff_num;
+              this.diff_num = diff_num;
 
-            this.update_flag = false;
-          }, 2500);
+              this.update_flag = false;
+            }, 2500);
+          }
         }
       }
     },
@@ -392,6 +450,21 @@ export default {
     },
     now_timestamp() {
       return Math.round(Date.now() / 1000);
+    },
+    text_add_click() {
+      this.$refs.file.click();
+    },
+    save_conf() {
+      let export_data = [];
+      for (let i of this.data.text) {
+        if ("roasted_text" in i) {
+          export_data.push({ speaker: i.speaker, text: i.roasted_text });
+        }
+      }
+      let blob = new Blob([JSON.stringify(export_data)], {
+        type: "application/json;charset=utf-8"
+      });
+      saveAs(blob, `${this.data.title}.json`);
     }
   },
   computed: {
@@ -409,8 +482,13 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .bg_transition {
   transition: background 0.5s;
+}
+
+.menu_active {
+  color: white;
+  background: $pink-11;
 }
 </style>
