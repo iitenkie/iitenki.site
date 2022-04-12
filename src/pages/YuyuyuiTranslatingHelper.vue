@@ -53,7 +53,7 @@
             type="file"
             ref="file"
             style="display: none"
-            @change="add()"
+            @change="add"
             accept="text/*"
           />
         </div>
