@@ -272,7 +272,7 @@ export default {
             this.update_flag = true;
             setTimeout(async () => {
               let data_old_raw = await this.get(`/cookieartbot/yyyi/record/${this.data._id}`);
-              let data_old = data_old_raw.data.data[0];
+              let data_old = data_old_raw.data.data;
 
               if (
                 data_old.last_modified > this.last_updated &&
