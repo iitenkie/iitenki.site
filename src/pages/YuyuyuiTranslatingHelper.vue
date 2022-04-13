@@ -283,6 +283,7 @@ export default {
 
               let diff_num = 0;
               for (const i in this.data) {
+                if (i == "last_modified") continue;
                 if (i != "text") {
                   if (this.data[i] != data_old[i]) {
                     diff_num++;
