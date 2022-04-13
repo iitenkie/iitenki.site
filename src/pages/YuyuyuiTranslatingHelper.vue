@@ -252,10 +252,12 @@ export default {
   },
   watch: {
     async page(val) {
-      let resp = await this.get("/cookieartbot/yyyi/records", {
-        limit: this.limit,
-        skip: (this.page - 1) * this.limit,
-        projection: JSON.stringify({ text: 0 })
+      let resp = await this.get("/cookieartbot/yyyi/record", {
+        params: {
+          limit: this.limit,
+          skip: (this.page - 1) * this.limit,
+          projection: JSON.stringify({ text: 0 })
+        }
       });
       this.text_list = resp.data.data;
     },
@@ -269,9 +271,7 @@ export default {
           if (!this.update_flag && old_val.text.length != 0) {
             this.update_flag = true;
             setTimeout(async () => {
-              let data_old_raw = await this.get("/cookieartbot/yyyi/records", {
-                query: JSON.stringify({ _id: this.data._id })
-              });
+              let data_old_raw = await this.get(`/cookieartbot/yyyi/record/${this.data._id}`);
               let data_old = data_old_raw.data.data[0];
 
               if (
@@ -317,28 +317,46 @@ export default {
       let reader = new FileReader();
       reader.onload = async () => {
         let dat = this.yuyuyui_script_serialize(reader.result);
-        await this.post("/cookieartbot/yyyi/add", {
-          title: file.name,
-          text: dat
+        await this.post("/cookieartbot/yyyi/record", {
+          data: {
+            title: file.name,
+            text: dat
+          }
         });
         await this.reset();
       };
       reader.readAsText(file);
     },
-    get(url, params = {}) {
+    get(url, config = {}) {
       return this.$axios({
         method: "get",
         url: url,
         responseType: "json",
-        params: params
+        ...config
       });
     },
-    post(url, data) {
+    post(url, config = {}) {
       return this.$axios({
         method: "post",
         url: url,
         responseType: "json",
-        data: data
+        ...config
+      });
+    },
+    put(url, config = {}) {
+      return this.$axios({
+        method: "put",
+        url: url,
+        responseType: "json",
+        ...config
+      });
+    },
+    delete(url, config = {}) {
+      return this.$axios({
+        method: "delete",
+        url: url,
+        responseType: "json",
+        ...config
       });
     },
     yuyuyui_script_serialize(text) {
@@ -415,11 +433,12 @@ export default {
     },
     async reset() {
       let requests = [
-        this.get("/cookieartbot/yyyi/records", {
-          limit: this.limit,
-          skip: (this.page - 1) * this.limit
+        this.get("/cookieartbot/yyyi/record", {
+          params: {
+            limit: this.limit,
+            skip: (this.page - 1) * this.limit
+          }
         }),
-        this.get("/cookieartbot/yyyi/records_count"),
         this.get("/cookieartbot/yyyi/dicts")
       ];
       let resp = await Promise.all(requests);
@@ -428,16 +447,15 @@ export default {
         this.text_select in this.text_list
           ? this.text_list[this.text_select]
           : { text: [] };
-      this.text_count = resp[1].data.count;
-      this.dicts = resp[2].data.data;
+      this.text_count = resp[0].data.count;
+      this.dicts = resp[1].data.data;
       this.loaded = true;
     },
     speaker_replace(speaker) {
       return this.all_entries[speaker] ? this.all_entries[speaker] : "";
     },
     async update() {
-      let res = await this.post("/cookieartbot/yyyi/update", {
-        query: { _id: this.data._id },
+      let res = await this.put(`/cookieartbot/yyyi/record/${this.data._id}`, {
         data: this.data
       });
       if (res.status == 200) {
