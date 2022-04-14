@@ -263,6 +263,7 @@ export default {
     },
     async text_select(val) {
       this.data = this.text_list[val];
+      window.scrollTo(0, 0);
     },
     data: {
       deep: true,
@@ -271,14 +272,15 @@ export default {
           if (!this.update_flag && old_val.text.length != 0) {
             this.update_flag = true;
             setTimeout(async () => {
-              let data_old_raw = await this.get(`/cookieartbot/yyyi/record/${this.data._id}`);
+              let data_old_raw = await this.get(
+                `/cookieartbot/yyyi/record/${this.data._id}`
+              );
               let data_old = data_old_raw.data.data;
 
               if (
                 data_old.last_modified > this.last_updated &&
                 this.last_updated != null
               ) {
-                console.log(data_old.last_modified, this.last_updated);
                 location.reload();
               }
 
@@ -461,7 +463,7 @@ export default {
       });
       if (res.status == 200) {
         this.diff_num = 0;
-        this.last_updated = this.data.last_modified = this.now_timestamp();
+        this.last_updated = this.data.last_modified = res.data.last_modified;
       } else {
         this.$q.notify({
           message: `保存失败，请检查`,
