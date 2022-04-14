@@ -122,6 +122,7 @@
                     color="primary"
                     icon="update"
                     size="xs"
+                    tabindex="-1"
                     flat
                     round
                   />
@@ -170,16 +171,41 @@
                   placeholder="译文"
                   class="text roasted-font"
                   autogrow
-                />
+                >
+                  <template v-slot:append>
+                    <q-btn
+                      v-if="item.comment == undefined"
+                      @click="item.comment = ''"
+                      icon="arrow_drop_down"
+                      size="sm"
+                      round
+                      flat
+                    ></q-btn>
+                  </template>
+                </q-input>
                 <q-input
+                  v-if="item.comment != undefined"
                   v-model="item.comment"
-                  debounce="500"
                   type="text"
                   color="pink"
                   placeholder="备注"
+                  tabindex="-1"
                   dense
                   autogrow
-                />
+                >
+                  <template v-slot:append>
+                    <q-btn
+                      v-if="
+                        item.comment != undefined && item.comment.length == 0
+                      "
+                      @click="item.comment = undefined"
+                      icon="arrow_drop_up"
+                      size="sm"
+                      round
+                      flat
+                    ></q-btn>
+                  </template>
+                </q-input>
               </q-card-section>
             </q-card>
 
@@ -388,7 +414,6 @@ export default {
             roasted_speaker: "",
             text: "",
             roasted_text: "",
-            comment: ""
           };
 
           let _text = [];
