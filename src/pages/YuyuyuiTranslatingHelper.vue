@@ -470,7 +470,7 @@ export default {
       }
     },
     now_timestamp() {
-      return Math.round(Date.now() / 1000);
+      return Math.round(Date.now());
     },
     text_add_click() {
       this.$refs.file.click();
