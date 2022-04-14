@@ -236,7 +236,7 @@ export default {
   name: "YuyuyuiTranslationHelper",
   data() {
     return {
-      last_updated: null,
+      last_updated: undefined,
       loaded: false,
       text_list: [],
       text_select: 0,
@@ -278,8 +278,8 @@ export default {
               let data_old = data_old_raw.data.data;
 
               if (
-                data_old.last_modified > this.last_updated &&
-                this.last_updated != null
+                this.data.last_modified != undefined &&
+                data_old.last_modified > this.data.last_modified
               ) {
                 location.reload();
               } else {
@@ -463,7 +463,7 @@ export default {
       });
       if (res.status == 200) {
         this.diff_num = 0;
-        this.last_updated = this.data.last_modified = res.data.last_modified;
+        this.data.last_modified = res.data.last_modified;
       } else {
         this.$q.notify({
           message: `保存失败，请检查`,
