@@ -278,6 +278,7 @@ export default {
                 data_old.last_modified > this.last_updated &&
                 this.last_updated != null
               ) {
+                console.log(data_old.last_modified, this.last_updated);
                 location.reload();
               }
 
