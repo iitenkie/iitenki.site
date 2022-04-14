@@ -282,27 +282,27 @@ export default {
                 this.last_updated != null
               ) {
                 location.reload();
-              }
-
-              let diff_num = 0;
-              for (const i in this.data) {
-                if (i == "last_modified") continue;
-                if (i != "text") {
-                  if (this.data[i] != data_old[i]) {
-                    diff_num++;
-                  }
-                } else {
-                  for (const ii in this.data[i]) {
-                    for (const iii in this.data[i][ii]) {
-                      if (this.data[i][ii][iii] != data_old[i][ii][iii]) {
-                        diff_num++;
-                        break;
+              } else {
+                let diff_num = 0;
+                for (const i in this.data) {
+                  if (i == "last_modified") continue;
+                  if (i != "text") {
+                    if (this.data[i] != data_old[i]) {
+                      diff_num++;
+                    }
+                  } else {
+                    for (const ii in this.data[i]) {
+                      for (const iii in this.data[i][ii]) {
+                        if (this.data[i][ii][iii] != data_old[i][ii][iii]) {
+                          diff_num++;
+                          break;
+                        }
                       }
                     }
                   }
                 }
+                this.diff_num = diff_num;
               }
-              this.diff_num = diff_num;
 
               this.update_flag = false;
             }, 2500);
