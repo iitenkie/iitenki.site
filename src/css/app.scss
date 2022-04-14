@@ -1,1 +1,36 @@
 // app global css in SCSS form
+@font-face {
+  font-family: JiaLiZhongYuanJ;
+  src: url(./fonts/JiaLiZhongYuanJ_modded.woff2);
+}
+
+@font-face {
+  font-family: SeuratPro;
+  src: url(./fonts/FOT-SeuratPro-M.otf);
+}
+
+@font-face {
+  font-family: HummingStd;
+  src: url(./fonts/FOT-HummingStd-M.otf);
+}
+
+@font-face {
+    font-family: QinYuanJ;
+    src: url(./fonts/QinYuanJ.ttf);
+  }
+
+.roasted-font {
+  font-family: "JiaLiZhongYuanJ";
+}
+
+.original-font {
+  font-family: "SeuratPro";
+}
+
+.speaker-font {
+  font-family: "HummingStd";
+}
+
+.roasted-speaker-font {
+    font-family: "QinYuanJ";
+  }

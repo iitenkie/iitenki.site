@@ -114,7 +114,7 @@
             <q-card v-if="item.type == 'text'" flat bordered>
               <div class="row q-px-md q-py-xs bg-pink-1">
                 <div>
-                  {{ item.speaker }}
+                  <span class="speaker-font">{{ item.speaker }}</span>
                   <q-btn
                     @click="
                       item.roasted_speaker = speaker_replace(item.speaker)
@@ -127,9 +127,9 @@
                   />
                   <div
                     :class="
-                      'cursor-pointer text-caption' +
+                      'cursor-pointer text-caption roasted-speaker-font' +
                         (item.roasted_speaker
-                          ? ' text-grey'
+                          ? ' text-grey-8'
                           : ' text-negative text-bold')
                     "
                   >
@@ -157,6 +157,7 @@
                   <template v-slot:control>
                     <div
                       v-html="item.text"
+                      class="text original-font"
                       style="white-space: pre-line;"
                     ></div>
                   </template>
@@ -167,6 +168,7 @@
                   type="textarea"
                   color="pink"
                   placeholder="译文"
+                  class="text roasted-font"
                   autogrow
                 />
                 <q-input
@@ -514,5 +516,9 @@ export default {
 .menu_active {
   color: white;
   background: $pink-11;
+}
+
+.text {
+  font-size: 1.1em;
 }
 </style>
