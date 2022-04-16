@@ -358,6 +358,9 @@ export default {
     data: {
       deep: true,
       handler(val, old_val) {
+        console.log(val._id, old_val._id);
+        console.log(!this.update_flag, old_val.text.length);
+        console.log(undefined);
         if (val._id == old_val._id) {
           if (!this.update_flag && old_val.text.length != 0) {
             this.update_flag = true;
