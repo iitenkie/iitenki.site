@@ -71,7 +71,13 @@
               </q-list>
             </q-menu>
           </q-btn>
-          <q-checkbox v-model="multiple_selecting" size="sm" color="pink-11" />
+          <q-checkbox
+            v-model="multiple_selecting"
+            size="sm"
+            color="pink-11"
+            class="q-mx-sm"
+            dense
+          />
           <input
             type="file"
             ref="file"
