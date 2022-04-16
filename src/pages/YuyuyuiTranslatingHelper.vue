@@ -34,6 +34,7 @@
           文本
           <q-space />
           <q-btn
+            v-if="!multiple_selecting"
             padding="none"
             color="pink-11"
             icon="add"
@@ -42,6 +43,7 @@
             flat
           />
           <q-btn
+            v-if="!multiple_selecting || text_selected.length !== 0"
             padding="none"
             color="pink-11"
             icon="ios_share"
@@ -50,10 +52,20 @@
           >
             <q-menu>
               <q-list style="min-width: 100px">
-                <q-item clickable @click="save_conf()" v-close-popup>
+                <q-item
+                  clickable
+                  @click="save_conf()"
+                  :disable="multiple_selecting"
+                  v-close-popup
+                >
                   <q-item-section>脚本用</q-item-section>
                 </q-item>
-                <q-item clickable @click="save_text()" v-close-popup>
+                <q-item
+                  clickable
+                  @click="save_text()"
+                  :disable="multiple_selecting && text_selected.length === 0"
+                  v-close-popup
+                >
                   <q-item-section>可读格式</q-item-section>
                 </q-item>
               </q-list>
@@ -79,7 +91,7 @@
           active-class="menu_active"
           class="q-ma-xs rounded-borders"
         >
-          <q-item-section v-if="multiple_selecting">
+          <q-item-section v-if="multiple_selecting" side>
             <q-checkbox
               v-model="text_selected"
               :val="item._id"
@@ -88,7 +100,13 @@
             />
           </q-item-section>
           <q-item-section>
-            {{ item.title }}
+            <div v-text="item.title"></div>
+            <div
+              v-if="item.comment"
+              v-text="item.comment"
+              style="font-size: 0.9em;"
+              class="text-italic"
+            ></div>
           </q-item-section>
         </q-item>
 
@@ -594,9 +612,9 @@ export default {
       );
       saveAs(blob, `${this.data.title}.json`);
     },
-    save_text() {
+    data2text(data) {
       let export_data = [];
-      for (let i of this.data.text) {
+      for (let i of data.text) {
         if (i.type === "text") {
           let text_line = [`${i.roasted_speaker}    <${i.speaker_skin}>`];
           for (let ii of i.roasted_text.split("\n")) {
@@ -609,6 +627,24 @@ export default {
           export_data.push(`BGM: ${i.name}`);
         } else if (i.type === "se") {
           export_data.push(`SE: ${i.name}`);
+        }
+      }
+
+      return export_data;
+    },
+    async save_text() {
+      let export_data;
+      if (!this.multiple_selecting) {
+        export_data = this.data2text(this.data);
+      } else {
+        export_data = [];
+        let requests = [];
+        for (let i of this.text_selected) {
+          requests.push(this.get(`/cookieartbot/yyyi/record/${i}`));
+        }
+        let resp = await Promise.all(requests);
+        for (let i of resp) {
+          export_data = [...export_data, ...this.data2text(i.data.data)];
         }
       }
       let blob = new Blob([export_data.join("\n\n")], {
