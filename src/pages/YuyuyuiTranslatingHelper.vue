@@ -201,6 +201,7 @@
                       @click="item.comment = undefined"
                       icon="arrow_drop_up"
                       size="sm"
+                      tabindex="-1"
                       round
                       flat
                     ></q-btn>
@@ -413,7 +414,7 @@ export default {
             speaker_skin: extract[2],
             roasted_speaker: "",
             text: "",
-            roasted_text: "",
+            roasted_text: ""
           };
 
           let _text = [];
@@ -509,12 +510,18 @@ export default {
       let export_data = [];
       for (let i of this.data.text) {
         if ("roasted_text" in i) {
-          export_data.push({ speaker: i.speaker, text: i.roasted_text });
+          export_data.push({
+            speaker: i.roasted_speaker,
+            text: i.roasted_text
+          });
         }
       }
-      let blob = new Blob([JSON.stringify(export_data)], {
-        type: "application/json;charset=utf-8"
-      });
+      let blob = new Blob(
+        [JSON.stringify({ type: "translating_helper", data: export_data })],
+        {
+          type: "application/json;charset=utf-8"
+        }
+      );
       saveAs(blob, `${this.data.title}.json`);
     }
   },
