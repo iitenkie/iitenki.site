@@ -59,6 +59,7 @@
               </q-list>
             </q-menu>
           </q-btn>
+          <q-checkbox v-model="multiple_selecting" size="sm" color="pink-11" />
           <input
             type="file"
             ref="file"
@@ -71,13 +72,21 @@
         <q-item
           v-for="(item, i) in text_list"
           :key="i"
-          clickable
-          v-ripple
-          :active="text_select === item._id"
+          :clickable="!multiple_selecting"
+          :v-ripple="!multiple_selecting"
+          :active="multiple_selecting ? false : text_select === item._id"
           @click="text_select = item._id"
           active-class="menu_active"
           class="q-ma-xs rounded-borders"
         >
+          <q-item-section v-if="multiple_selecting">
+            <q-checkbox
+              v-model="text_selected"
+              :val="item._id"
+              color="pink-11"
+              dense
+            />
+          </q-item-section>
           <q-item-section>
             {{ item.title }}
           </q-item-section>
@@ -92,7 +101,7 @@
           />
         </div>
 
-        <q-inner-loading :showing="text_list.length == 0 && !loaded">
+        <q-inner-loading :showing="text_list_loading">
           <q-spinner-bars size="50px" color="pink" />
         </q-inner-loading>
 
@@ -110,7 +119,7 @@
               {{ item.name }}
             </q-item-section>
           </q-item>
-          <q-inner-loading :showing="dicts.length == 0 && !loaded">
+          <q-inner-loading :showing="dict_loading">
             <q-spinner-bars size="50px" color="pink" />
           </q-inner-loading>
         </q-expansion-item>
@@ -297,9 +306,9 @@ export default {
     return {
       last_updated: undefined,
       update_timeout_id: undefined,
-      loaded: false,
       text_list: [],
       text_select: "",
+      text_selected: [],
       text_count: 0,
       dicts: [],
       data: { text: [] },
@@ -307,12 +316,16 @@ export default {
       update_flag: false,
       right: false,
       text_loading: false,
-      limit: 4,
+      text_list_loading: false,
+      dict_loading: false,
+      multiple_selecting: false,
+      limit: 20,
       page: 1
     };
   },
   watch: {
     async page(val) {
+      this.text_list_loading = true;
       let resp = await this.get("/cookieartbot/yyyi/record", {
         params: {
           limit: this.limit,
@@ -321,6 +334,7 @@ export default {
         }
       });
       this.text_list = resp.data.data;
+      this.text_list_loading = false;
     },
     async text_select(val, old_val) {
       this.text_loading = true;
@@ -386,6 +400,9 @@ export default {
     },
     diff_num(val) {
       if (val > 0) this.update();
+    },
+    multiple_selecting(val) {
+      if (!val) this.text_selected = [];
     }
   },
   methods: {
@@ -508,6 +525,7 @@ export default {
       return data;
     },
     async reset() {
+      this.dict_loading = true;
       const requests = [
         this.get("/cookieartbot/yyyi/record", {
           params: {
@@ -523,7 +541,7 @@ export default {
       this.text_select = resp[0].data.data[0]._id;
       this.text_count = resp[0].data.count;
       this.dicts = resp[1].data.data;
-      this.loaded = true;
+      this.dict_loading = false;
     },
     speaker_replace(speaker) {
       return this.all_entries[speaker] ? this.all_entries[speaker] : "";
