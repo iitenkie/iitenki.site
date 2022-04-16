@@ -73,8 +73,8 @@
           :key="i"
           clickable
           v-ripple
-          :active="text_select === i"
-          @click="text_select = i"
+          :active="text_select === item._id"
+          @click="text_select = item._id"
           active-class="menu_active"
           class="q-ma-xs rounded-borders"
         >
@@ -222,13 +222,23 @@
 
             <q-card
               v-else-if="item.type == 'location'"
-              v-text="item.name"
               flat
               bordered
               dense
-              class="bg-pink-1 text-h5 speaker-font q-pa-sm"
+              class="bg-pink-1 text-h5 speaker-font cursor-pointer q-pa-sm"
               style="text-align: center;"
             >
+              <div>
+                {{ item.name }}
+                <q-popup-edit v-model="item.name" auto-save>
+                  <q-input
+                    v-model="item.name"
+                    debounce="1000"
+                    dense
+                    autofocus
+                  />
+                </q-popup-edit>
+              </div>
             </q-card>
 
             <q-chip v-else>
@@ -270,7 +280,7 @@
           />
         </q-page-sticky>
 
-        <q-inner-loading :showing="data.text.length == 0 && !loaded">
+        <q-inner-loading :showing="text_loading" style="position: fixed;">
           <q-spinner-bars size="50px" color="pink" />
         </q-inner-loading>
       </q-page>
@@ -286,16 +296,18 @@ export default {
   data() {
     return {
       last_updated: undefined,
+      update_timeout_id: undefined,
       loaded: false,
       text_list: [],
-      text_select: 0,
+      text_select: "",
       text_count: 0,
       dicts: [],
       data: { text: [] },
       diff_num: 0,
       update_flag: false,
       right: false,
-      limit: 20,
+      text_loading: false,
+      limit: 4,
       page: 1
     };
   },
@@ -310,9 +322,38 @@ export default {
       });
       this.text_list = resp.data.data;
     },
-    async text_select(val) {
-      this.data = this.text_list[val];
-      window.scrollTo(0, 0);
+    async text_select(val, old_val) {
+      this.text_loading = true;
+      if (this.update_timeout_id !== undefined) {
+        clearTimeout(this.update_timeout_id);
+        this.update_timeout_id = undefined;
+      }
+      try {
+        let resp;
+        if (old_val !== "") {
+          const requests = [
+            this.get(`/cookieartbot/yyyi/record/${val}`),
+            this.get(`/cookieartbot/yyyi/record/${old_val}`)
+          ];
+          resp = await Promise.all(requests);
+          if (this.data_compare(resp[1].data.data, this.data) > 0) {
+            await this.update();
+          }
+          this.data = resp[0].data.data;
+        } else {
+          resp = await this.get(`/cookieartbot/yyyi/record/${val}`);
+          this.data = resp.data.data;
+        }
+        window.scrollTo(0, 0);
+      } catch (err) {
+        this.$q.notify({
+          message: `加载失败！${err.message}`,
+          color: "negative",
+          position: "top"
+        });
+      } finally {
+        this.text_loading = false;
+      }
     },
     data: {
       deep: true,
@@ -320,7 +361,7 @@ export default {
         if (val._id == old_val._id) {
           if (!this.update_flag && old_val.text.length != 0) {
             this.update_flag = true;
-            setTimeout(async () => {
+            this.update_timeout_id = setTimeout(async () => {
               let data_old_raw = await this.get(
                 `/cookieartbot/yyyi/record/${this.data._id}`
               );
@@ -332,28 +373,11 @@ export default {
               ) {
                 location.reload();
               } else {
-                let diff_num = 0;
-                for (const i in this.data) {
-                  if (i == "last_modified") continue;
-                  if (i != "text") {
-                    if (this.data[i] != data_old[i]) {
-                      diff_num++;
-                    }
-                  } else {
-                    for (const ii in this.data[i]) {
-                      for (const iii in this.data[i][ii]) {
-                        if (this.data[i][ii][iii] != data_old[i][ii][iii]) {
-                          diff_num++;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-                this.diff_num = diff_num;
+                this.diff_num = this.data_compare(this.data, data_old);
               }
 
               this.update_flag = false;
+              this.update_timeout_id = undefined;
             }, 2500);
           }
         }
@@ -483,21 +507,19 @@ export default {
       return data;
     },
     async reset() {
-      let requests = [
+      const requests = [
         this.get("/cookieartbot/yyyi/record", {
           params: {
             limit: this.limit,
-            skip: (this.page - 1) * this.limit
+            skip: (this.page - 1) * this.limit,
+            projection: JSON.stringify({ text: 0 })
           }
         }),
         this.get("/cookieartbot/yyyi/dicts")
       ];
       let resp = await Promise.all(requests);
       this.text_list = resp[0].data.data;
-      this.data =
-        this.text_select in this.text_list
-          ? this.text_list[this.text_select]
-          : { text: [] };
+      this.text_select = resp[0].data.data[0]._id;
       this.text_count = resp[0].data.count;
       this.dicts = resp[1].data.data;
       this.loaded = true;
@@ -574,6 +596,27 @@ export default {
         type: "text/plain;charset=utf-8"
       });
       saveAs(blob, `${this.data.title.replace(/.txt/g, "")}_roasted.txt`);
+    },
+    data_compare(new_data, old_data) {
+      let diff_num = 0;
+      for (const i in new_data) {
+        if (i == "last_modified") continue;
+        if (i != "text") {
+          if (new_data[i] != old_data[i]) {
+            diff_num++;
+          }
+        } else {
+          for (const ii in new_data[i]) {
+            for (const iii in new_data[i][ii]) {
+              if (new_data[i][ii][iii] != old_data[i][ii][iii]) {
+                diff_num++;
+                break;
+              }
+            }
+          }
+        }
+      }
+      return diff_num;
     }
   },
   computed: {
