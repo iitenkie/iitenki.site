@@ -45,10 +45,20 @@
             padding="none"
             color="pink-11"
             icon="ios_share"
-            @click="save_conf()"
             class="q-mx-sm"
             flat
-          />
+          >
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item clickable @click="save_conf()" v-close-popup>
+                  <q-item-section>脚本用</q-item-section>
+                </q-item>
+                <q-item clickable @click="save_text()" v-close-popup>
+                  <q-item-section>可读格式</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
           <input
             type="file"
             ref="file"
@@ -216,7 +226,7 @@
               flat
               bordered
               dense
-              class="bg-pink-1 text-h6 q-pa-sm"
+              class="bg-pink-1 text-h5 speaker-font q-pa-sm"
               style="text-align: center;"
             >
             </q-card>
@@ -238,6 +248,16 @@
             </q-chip>
           </div>
         </div>
+
+        <q-page-sticky position="top-right" :offset="[18, 18]">
+          <q-btn
+            icon="book"
+            size="lg"
+            @click="speaker_replace_all()"
+            color="pink"
+            fab
+          />
+        </q-page-sticky>
 
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
           <q-btn
@@ -431,7 +451,7 @@ export default {
           data.push(form);
           id++;
         } else if (/^BGM: .*$/.test(el)) {
-          let extract = el.match(/^BGM: (.*$)/);
+          let extract = el.match(/^BGM: (.*)$/);
           let form = {
             _id: id,
             type: "bgm",
@@ -440,7 +460,7 @@ export default {
           data.push(form);
           id++;
         } else if (/^SE: .*$/.test(el)) {
-          let extract = el.match(/^SE: (.*$)/);
+          let extract = el.match(/^SE: (.*)$/);
           let form = {
             _id: id,
             type: "se",
@@ -485,6 +505,15 @@ export default {
     speaker_replace(speaker) {
       return this.all_entries[speaker] ? this.all_entries[speaker] : "";
     },
+    speaker_replace_all() {
+      for (let i in this.data.text) {
+        if (this.data.text[i].roasted_speaker === "") {
+          this.data.text[i].roasted_speaker = this.speaker_replace(
+            this.data.text[i].speaker
+          );
+        }
+      }
+    },
     async update() {
       let res = await this.put(`/cookieartbot/yyyi/record/${this.data._id}`, {
         data: this.data
@@ -523,6 +552,28 @@ export default {
         }
       );
       saveAs(blob, `${this.data.title}.json`);
+    },
+    save_text() {
+      let export_data = [];
+      for (let i of this.data.text) {
+        if (i.type === "text") {
+          let text_line = [`${i.roasted_speaker}    <${i.speaker_skin}>`];
+          for (let ii of i.roasted_text.split("\n")) {
+            text_line.push(`    ${ii}`);
+          }
+          export_data.push(text_line.join("\n"));
+        } else if (i.type === "location") {
+          export_data.push(`■■■${i.name}■■■`);
+        } else if (i.type === "bgm") {
+          export_data.push(`BGM: ${i.name}`);
+        } else if (i.type === "se") {
+          export_data.push(`SE: ${i.name}`);
+        }
+      }
+      let blob = new Blob([export_data.join("\n\n")], {
+        type: "text/plain;charset=utf-8"
+      });
+      saveAs(blob, `${this.data.title.replace(/.txt/g, "")}_roasted.txt`);
     }
   },
   computed: {
