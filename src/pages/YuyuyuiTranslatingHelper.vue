@@ -348,7 +348,7 @@ export default {
     };
   },
   watch: {
-    async page(val) {
+    async page() {
       this.text_list_loading = true;
       let resp = await this.get("/cookieartbot/yyyi/record", {
         params: {
