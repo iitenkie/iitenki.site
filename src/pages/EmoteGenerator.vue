@@ -8,7 +8,8 @@
               ref="canvas"
               width="240"
               height="240"
-              class="shadow-6"
+              class="shadow-6 cursor-pointer"
+              @click="canvas_download"
             ></canvas>
           </div>
           <div class="flex flex-center row q-mb-sm">
@@ -26,28 +27,13 @@
           </div>
         </div>
       </transition>
-      <transition name="slide">
-        <div
-          v-if="state == 1"
-          @click="imgdownload(text1)"
-          class="text-center text-primary cursor-pointer"
-        >
-          <img
-            v-if="state == 1"
-            key="image"
-            class="q-mb-sm thumbnail shadow-6"
-            :src="image"
-          />
-          <q-icon name="arrow_upward" style="font-size: 1.75em" />
-          <br />
-          <span class="text-subtitle1">点击保存</span>
-        </div>
-      </transition>
     </div>
   </q-page>
 </template>
 
 <script>
+import { saveAs } from "file-saver";
+
 export default {
   name: "GetThumbnail",
   data() {
@@ -79,11 +65,14 @@ export default {
       let measure = ctx.measureText(text);
       return x - measure.width / 2;
     },
-    imgdownload(smid) {
-      let link = document.createElement("a");
-      link.href = this.image;
-      link.download = `${smid}.jpg`;
-      link.click();
+    canvas_download() {
+      this.$refs.canvas.toBlob(
+        blob => {
+          saveAs(blob, `${this.text1}${this.text2}_${this.text3}.jpg`);
+        },
+        "image/jpeg",
+        0.95
+      );
     }
   },
   mounted() {
