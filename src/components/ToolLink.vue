@@ -24,12 +24,12 @@ export default {
 
 <style lang="scss">
 .tlink {
-  color: black;
+  color: $pink;
   background: white;
 }
 
 .tlink-active {
-  color: #1976d2;
-  background: #eaf2f9;
+  color: $pink;
+  background: $pink-1;
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="header-bg text-white">
-      <q-toolbar>
+      <q-toolbar class="text-pink-8">
         <q-btn dense flat round icon="menu" @click="left = !left" />
-        <q-toolbar-title><img src="~assets/2995562.png"/></q-toolbar-title>
+        <q-toolbar-title>工具箱</q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -41,7 +41,7 @@ export default {
 
 <style lang="scss">
 .header-bg {
-  background-image: url("~assets/4471637_blur.png");
+  background-color: pink;
   background-repeat: no-repeat;
   background-position: 50% 12%;
   background-clip: border-box;

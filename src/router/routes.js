@@ -3,11 +3,16 @@ const routes = [
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", redirect: "get-thumbnail" },
+      { path: "", redirect: "emote-generator" },/*
       {
         path: "get-thumbnail",
         component: () => import("pages/GetThumbnail.vue"),
         name: "获取N站视频高清封面"
+      },*/
+      {
+        path: "emote-generator",
+        component: () => import("pages/EmoteGenerator.vue"),
+        name: "我没猜错的话生成器"
       }
     ]
   },

@@ -2,7 +2,7 @@
   "name": "iitenki_toolkit",
   "version": "0.0.1",
   "description": "一个工具箱",
-  "productName": "好天气工具箱",
+  "productName": "工具箱",
   "author": "iitenki",
   "private": true,
   "scripts": {
