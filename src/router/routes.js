@@ -41,6 +41,10 @@ const routes = [
     path: "/yushadearu-logo-generator",
     component: () => import("pages/YushadearuLogoGenerator.vue")
   },
+  {
+    path: "/ranking-config-maker",
+    component: () => import("pages/RankingConfigMaker.vue")
+  },
 
   // Always leave this as last one,
   // but you can also remove it
