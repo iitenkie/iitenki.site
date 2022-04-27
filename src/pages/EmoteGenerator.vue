@@ -54,6 +54,7 @@ export default {
   },
   mounted() {
     this.options = this._option();
+    this.select_value = this.options[0].name;
   }
 };
 </script>
