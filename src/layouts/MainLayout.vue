@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header elevated class="header-bg text-white">
+    <q-header bordered class="header-bg text-white">
       <q-toolbar class="text-pink-8">
         <q-btn dense flat round icon="menu" @click="left = !left" />
         <q-toolbar-title>工具箱</q-toolbar-title>

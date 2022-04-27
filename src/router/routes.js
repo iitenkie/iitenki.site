@@ -1,6 +1,6 @@
 const routes = [
   {
-    path: "/",
+    path: "/yuyuyu-tools",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", redirect: "emote-generator" },/*
@@ -12,7 +12,7 @@ const routes = [
       {
         path: "emote-generator",
         component: () => import("pages/EmoteGenerator.vue"),
-        name: "我没猜错的话生成器"
+        name: "鱼表情包生成器"
       }
     ]
   },

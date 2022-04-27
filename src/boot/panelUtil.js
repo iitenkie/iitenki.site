@@ -2,6 +2,7 @@ import axios from "axios";
 import { LocalStorage } from "quasar";
 import AV from "leancloud-storage";
 import { date } from "quasar";
+import { saveAs } from "file-saver";
 
 // "async" is optional;
 // more info on params: https://quasar.dev/quasar-cli/boot-files
@@ -41,6 +42,26 @@ export default async ({ Vue }) => {
 
     reload() {
       location.reload();
+    }
+
+    text_align(ctx, align, ...args) {
+      let measure = ctx.measureText(args[0]);
+      if (align == "c") {
+        args[1] -= measure.width / 2;
+      } else if (align == "r") {
+        args[1] -= measure.width;
+      }
+      ctx.fillText(...args);
+    }
+
+    save_canvas(canvas, fn, mime = "image/jpeg", quality = 0.95) {
+      canvas.toBlob(
+        blob => {
+          saveAs(blob, fn);
+        },
+        mime,
+        quality
+      );
     }
   }
 
