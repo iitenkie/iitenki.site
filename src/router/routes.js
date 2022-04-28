@@ -34,6 +34,10 @@ const routes = [
     ]
   },
   {
+    path: "/",
+    component: () => import("pages/GetThumbnail.vue")
+  },
+  {
     path: "/yuyuyui-translating-helper",
     component: () => import("pages/YuyuyuiTranslatingHelper.vue")
   },

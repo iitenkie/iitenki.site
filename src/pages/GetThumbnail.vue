@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center row">
+  <div class="flex flex-center row" style="height: 100vh;">
     <div class="col-lg-6 col-md-8 col-sm-10 col-xs-11">
       <transition name="slide">
         <q-form>
@@ -45,7 +45,7 @@
         </div>
       </transition>
     </div>
-  </q-page>
+  </div>
 </template>
 
 <script>
