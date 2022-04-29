@@ -1,136 +1,258 @@
 $yco: 0.2;
+$deg: 160deg;
+$start_color: transparent;
+$end_per: 75%;
 
 .default_chara {
-  background-color: rgba(158, 158, 158, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(158, 158, 158, $yco) $end_per
+  );
 }
 
 .yuuki_yuuna {
-  background-color: rgba(255, 153, 214, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(255, 153, 214, $yco) $end_per
+  );
 }
 
 .tougou_mimori {
-  background-color: rgba(138, 214, 229, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(138, 214, 229, $yco) $end_per
+  );
 }
 
 .inubouzaki_fuu {
-  background-color: rgba(248, 217, 62, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(248, 217, 62, $yco) $end_per
+  );
 }
 
 .inubouzaki_itsuki {
-  background-color: rgba(130, 217, 130, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(130, 217, 130, $yco) $end_per
+  );
 }
 
 .miyoshi_karin {
-  background-color: rgba(255, 115, 119, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(255, 115, 119, $yco) $end_per
+  );
 }
 
 .washio_sumi {
-  background-color: rgba(136, 155, 247, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(136, 155, 247, $yco) $end_per
+  );
 }
 
 .minowa_gin {
-  background-color: rgba(255, 126, 115, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(255, 126, 115, $yco) $end_per
+  );
 }
 
 .nogi_sonoko {
-  background-color: rgba(185, 128, 242, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(185, 128, 242, $yco) $end_per
+  );
 }
 
 .nogi_wakaba {
-  background-color: rgba(121, 172, 242, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(121, 172, 242, $yco) $end_per
+  );
 }
 
 .doi_tamako {
-  background-color: rgba(255, 136, 76, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(255, 136, 76, $yco) $end_per
+  );
 }
 
 .iyojima_anzu {
-  background-color: rgba(199, 184, 163, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(199, 184, 163, $yco) $end_per
+  );
 }
 
 .koori_chikage {
-  background-color: rgba(255, 110, 158, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(255, 110, 158, $yco) $end_per
+  );
 }
 
 .takashima_yuuna {
-  background-color: rgba(255, 153, 214, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(255, 153, 214, $yco) $end_per
+  );
 }
 
 .shiratori_utano {
-  background-color: rgba(170, 178, 125, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(170, 178, 125, $yco) $end_per
+  );
 }
 
 .akihara_sekka {
-  background-color: rgba(217, 163, 191, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(217, 163, 191, $yco) $end_per
+  );
 }
 
 .kohagura_natsume {
-  background-color: rgba(147, 205, 205, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(147, 205, 205, $yco) $end_per
+  );
 }
 
 .uesato_hinata {
-  background-color: rgba(239, 155, 93, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(239, 155, 93, $yco) $end_per
+  );
 }
 
 .fujimori_mito {
-  background-color: rgba(125, 214, 190, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(125, 214, 190, $yco) $end_per
+  );
 }
 
 .kusunoki_mebuki {
-  background-color: rgba(142, 221, 142, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(142, 221, 142, $yco) $end_per
+  );
 }
 
 .kokudo_aya {
-  background-color: rgba(224, 206, 119, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(224, 206, 119, $yco) $end_per
+  );
 }
 
 .kagajyou_suzume {
-  background-color: rgba(224, 213, 90, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(224, 213, 90, $yco) $end_per
+  );
 }
 
 .miroku_yumiko {
-  background-color: rgba(220, 154, 250, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(220, 154, 250, $yco) $end_per
+  );
 }
 
 .yamabushi_shizuku {
-  background-color: rgba(113, 219, 223, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(113, 219, 223, $yco) $end_per
+  );
 }
 
 .akamine_yuuna {
-  background-color: rgba(231, 94, 165, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(231, 94, 165, $yco) $end_per
+  );
 }
 
 .miroku_renge {
-  background-color: rgba(90, 172, 215, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(90, 172, 215, $yco) $end_per
+  );
 }
 
 .kiryuu_shizuka {
-  background-color: rgba(184, 112, 214, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(184, 112, 214, $yco) $end_per
+  );
 }
 
 .aki_masuzu {
-  background-color: rgba(255, 182, 95, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(255, 182, 95, $yco) $end_per
+  );
 }
 
 .hanamoto_yoshika {
-  background-color: rgba(202, 91, 206, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(202, 91, 206, $yco) $end_per
+  );
 }
 
 .fuyou_yuuna {
   background-image: linear-gradient(
-    124deg,
-    rgba(255, 36, 0, $yco),
-    rgba(232, 29, 29, $yco),
-    rgba(232, 183, 29, $yco),
-    rgba(227, 232, 29, $yco),
-    rgba(29, 232, 64, $yco),
-    rgba(29, 221, 232, $yco),
-    rgba(43, 29, 232, $yco),
-    rgba(221, 0, 243, $yco),
-    rgba(221, 0, 243, $yco)
+    $deg,
+    rgba(255, 36, 0, $yco * 0),
+    rgba(232, 29, 29, $yco * 14.29%),
+    rgba(232, 183, 29, $yco * 28.57%),
+    rgba(227, 232, 29, $yco * 42.86%),
+    rgba(29, 232, 64, $yco * 57.14%),
+    rgba(29, 221, 232, $yco * 71.43%),
+    rgba(43, 29, 232, $yco * 85.71%),
+    rgba(221, 0, 243, $yco * 100%)
   );
 }
 
 .yuzuki_yuuna {
-  background-color: rgba(152, 103, 106, $yco);
+  background-image: linear-gradient(
+    $deg,
+    $start_color,
+    rgba(152, 103, 106, $yco) $end_per
+  );
 }
