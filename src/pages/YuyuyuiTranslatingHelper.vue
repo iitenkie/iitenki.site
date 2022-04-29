@@ -155,7 +155,7 @@
         <div class="col-xs-12 col-sm-8 col-md-6 col-xl-4">
           <div v-for="(item, i) in data.text" :key="i" class="q-pb-sm">
             <q-card v-if="item.type == 'text'" flat bordered>
-              <div class="row q-px-md q-py-xs bg-pink-1">
+              <div :class="'row q-px-md q-py-xs ' + chara_color(item.speaker)">
                 <div>
                   <span class="speaker-font">{{ item.speaker }}</span>
                   <q-btn
@@ -678,6 +678,45 @@ export default {
         }
       }
       return diff_num;
+    },
+    chara_color(name) {
+      const chara_aliases = {
+        "結城 友奈": "yuuki_yuuna",
+        "東郷 美森": "tougou_mimori",
+        "犬吠埼 風": "inubouzaki_fuu",
+        "犬吠埼 樹": "inubouzaki_itsuki",
+        "三好 夏凜": "miyoshi_karin",
+        "鷲尾 須美": "washio_sumi",
+        "三ノ輪 銀": "minowa_gin",
+        "乃木 園子": "nogi_sonoko",
+        "乃木 若葉": "nogi_wakaba",
+        "土居 球子": "doi_tamako",
+        "伊予島 杏": "iyojima_anzu",
+        "郡 千景": "koori_chikage",
+        "高嶋 友奈": "takashima_yuuna",
+        "白鳥 歌野": "shiratori_utano",
+        "秋原 雪花": "akihara_sekka",
+        "古波蔵 棗": "kohagura_natsume",
+        "上里 ひなた": "uesato_hinata",
+        "藤森 水都": "fujimori_mito",
+        "楠 芽吹": "kusunoki_mebuki",
+        "国土 亜耶": "kokudo_aya",
+        "加賀城 雀": "kagajyou_suzume",
+        "弥勒 夕海子": "miroku_yumiko",
+        "山伏 しずく": "yamabushi_shizuku",
+        "山伏 シズク": "yamabushi_shizuku",
+        "赤嶺 友奈": "akamine_yuuna",
+        "弥勒 蓮華": "miroku_renge",
+        "桐生 静": "kiryuu_shizuka",
+        "安芸 真鈴": "aki_masuzu",
+        "花本 美佳": "hanamoto_yoshika",
+        "芙蓉 友奈": "fuyou_yuuna",
+        "柚木 友奈": "yuzuki_yuuna"
+      };
+
+      if (chara_aliases[name] !== undefined) {
+        return chara_aliases[name];
+      } else return "default_chara";
     }
   },
   computed: {
@@ -696,6 +735,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../css/yuyuyui_chara_color.scss";
+
 .bg_transition {
   transition: background 0.5s;
 }
