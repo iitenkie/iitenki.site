@@ -491,7 +491,7 @@ export default {
 
         if (/^.*    <.*>$/.test(el)) {
           i++;
-          let extract = el.match(/^(.*)    <(.*)>$/);
+          const extract = el.match(/^(.*)    <(.*)>$/);
 
           let form = {
             _id: id,
@@ -517,7 +517,7 @@ export default {
           data.push(form);
           id++;
         } else if (/^BGM: .*$/.test(el)) {
-          let extract = el.match(/^BGM: (.*)$/);
+          const extract = el.match(/^BGM: (.*)$/);
           let form = {
             _id: id,
             type: "bgm",
@@ -526,7 +526,7 @@ export default {
           data.push(form);
           id++;
         } else if (/^SE: .*$/.test(el)) {
-          let extract = el.match(/^SE: (.*)$/);
+          const extract = el.match(/^SE: (.*)$/);
           let form = {
             _id: id,
             type: "se",
@@ -535,7 +535,7 @@ export default {
           data.push(form);
           id++;
         } else if (/^■■■.*■■■$/.test(el)) {
-          let extract = el.match(/^■■■(.*)■■■$/);
+          const extract = el.match(/^■■■(.*)■■■$/);
           let form = {
             _id: id,
             type: "location",
