@@ -1,0 +1,56 @@
+color-deg = 160;
+start-opacity = 0.05;
+end-opacity = 0.39;
+end-per = 75%;
+characters = {
+  default_chara: #9e9e9e,
+  yuuki_yuuna: #ff99d6,
+  tougou_mimori: #8ad6e5,
+  inubouzaki_fuu: #f8d93e,
+  inubouzaki_itsuki: #82d982,
+  miyoshi_karin: #ff7377,
+  washio_sumi: #889bf7,
+  minowa_gin: #ff7e73,
+  nogi_sonoko: #b980f2,
+  nogi_wakaba: #79acf2,
+  doi_tamako: #ff884c,
+  iyojima_anzu: #c7b8a3,
+  koori_chikage: #ff6e9e,
+  takashima_yuuna: #ff99d6,
+  shiratori_utano: #aab27d,
+  akihara_sekka: #d9a3bf,
+  kohagura_natsume: #93cdcd,
+  uesato_hinata: #ef9b5d,
+  fujimori_mito: #7dd6be,
+  kusunoki_mebuki: #8edd8e,
+  kokudo_aya: #e0ce77,
+  kagajyou_suzume: #e0d55a,
+  miroku_yumiko: #dc9afa,
+  yamabushi_shizuku: #71dbdf,
+  akamine_yuuna: #e75ea5,
+  miroku_renge: #5aacd7,
+  kiryuu_shizuka: #b870d6,
+  aki_masuzu: #ffb65f,
+  hanamoto_yoshika: #ca5bce,
+  yuzuki_yuuna: #98676a
+};
+
+for key, value in characters {
+  .{key} {
+    background-image: linear-gradient(unit(color-deg, deg), rgba(value, start-opacity), rgba(value, end-opacity) end-per);
+  }
+}
+
+.fuyou_yuuna {
+  segmentation = 8;
+  h_seg = range(0, 300, (300 / segmentation));
+  per_seg = range(start-opacity, end-opacity, ((end-opacity - start-opacity) / segmentation));
+  args = unit(color-deg, deg);
+
+  for i in 0 .. segmentation {
+    push(args, hsla(h_seg[i], 100%, 50%, round(per_seg[i], 3)));
+  }
+
+  args = unquote(join(', ', args));
+  background-image: linear-gradient(args);
+}

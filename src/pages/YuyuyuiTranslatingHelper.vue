@@ -734,8 +734,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import "../css/yuyuyui_chara_color.scss";
+<style lang="stylus">
+@import "../css/yuyuyui_chara_color.styl";
 
 .bg_transition {
   transition: background 0.5s;
