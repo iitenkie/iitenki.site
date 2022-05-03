@@ -69,7 +69,7 @@ export default {
       let ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(this.img, 0, 0);
-      ctx.font = "bolder 22px SourceHanSans";
+      ctx.font = "bolder 22px SourceHanSansSC";
       this.$util.text_align(ctx, "c", this.texts.text1, 120, 38);
       this.$util.text_align(ctx, "c", this.texts.text2, 120, 67);
       this.$util.text_align(ctx, "c", this.texts.text3, 127, 214);
@@ -108,13 +108,10 @@ export default {
 @font-face {
   font-family: SourceHanSansSC;
   font-weight: bold;
-  src: url(../../css/fonts/yutools/SourceHanSansSC-Bold.otf);
-}
-
-@font-face {
-  font-family: SourceHanSansSC;
-  font-weight: bolder;
-  src: url(../../css/fonts/yutools/SourceHanSansSC-Heavy.otf);
+  src: url(../../css/fonts/yutools/SourceHanSansSC-VF.otf.woff2);
+  font-display: block;
+  font-style: normal;
+  font-weight: 100 900;
 }
 
 .canvas {
