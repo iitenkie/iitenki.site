@@ -62,6 +62,14 @@
                 </q-item>
                 <q-item
                   clickable
+                  @click="save_serv_conf()"
+                  :disable="multiple_selecting"
+                  v-close-popup
+                >
+                  <q-item-section>私服用</q-item-section>
+                </q-item>
+                <q-item
+                  clickable
                   @click="save_text()"
                   :disable="multiple_selecting && text_selected.length === 0"
                   v-close-popup
@@ -152,7 +160,7 @@
 
     <q-page-container>
       <q-page class="flex flex-center row" padding>
-        <div class="col-xs-12 col-sm-8 col-md-6 col-xl-4">
+        <div class="col-xs-12 col-sm-8 col-md-6 col-xl-4" ref="capture">
           <div v-for="(item, i) in data.text" :key="i" class="q-pb-sm">
             <q-card v-if="item.type == 'text'" flat bordered>
               <div :class="'row q-px-md q-py-xs ' + chara_color(item.speaker)">
@@ -435,6 +443,7 @@ export default {
       let reader = new FileReader();
       reader.onload = async () => {
         let dat = this.yuyuyui_script_serialize(reader.result);
+
         await this.post("/cookieartbot/yyyi/record", {
           data: {
             title: file.name,
@@ -477,7 +486,7 @@ export default {
         ...config
       });
     },
-    yuyuyui_script_serialize(text) {
+    yuyuyui_script_serialize_old(text) {
       function size_replace(a, p1, p2, b, c) {
         return `<span style="font-size: ${Math.round((p1 / 48) * 100) /
           100}em;">${p2}</span>`;
@@ -548,6 +557,64 @@ export default {
 
       return data;
     },
+    yuyuyui_script_serialize(text) {
+      function size_replace(a, p1, p2, b, c) {
+        return `<span style="font-size: ${Math.round((p1 / 48) * 100) /
+          100}em;">${p2}</span>`;
+      }
+
+      text = text.split("\n");
+      let data = [];
+      for (let i in text) {
+        let el = text[i];
+
+        if (/^mes	(.+):(.+)	(.+)	(.+)$/.test(el)) {
+          const extract = el.match(/^mes	(.+):(.+)	(.+)	(.+)$/);
+
+          let form = {
+            type: "text",
+            speaker: extract[2],
+            speaker_skin: extract[1],
+            roasted_speaker: "",
+            voice: extract[3],
+            text: extract[4].replace("\\n", "\n"),
+            roasted_text: ""
+          };
+
+          form.text = form.text.replace(/@s\((\d+)\)\{(.+)\}/g, size_replace);
+          form.text = form.text.replace(
+            /@c\((.+)\)\{(.+)\}/g,
+            '<span style="color: $1;">$2</span>'
+          );
+          form.text = form.text.replace(/@b\{(.+)\}/g, "<b>$1</b>");
+
+          data.push(form);
+        } else if (/^bgm	(.+)	.*$/.test(el)) {
+          const extract = el.match(/^bgm	(.+)	.*$/);
+          let form = {
+            type: "bgm",
+            name: extract[1]
+          };
+          data.push(form);
+        } else if (/^se	(.+)	.*$/.test(el)) {
+          const extract = el.match(/^se	(.+)	.*$/);
+          let form = {
+            type: "se",
+            name: extract[1]
+          };
+          data.push(form);
+        } else if (/^caption	.+:(.+)	.*	.*	.*	.*	.*$/.test(el)) {
+          const extract = el.match(/^caption	.+:(.+)	.*	.*	.*	.*	.*$/);
+          let form = {
+            type: "location",
+            name: extract[1]
+          };
+          data.push(form);
+        } else continue;
+      }
+
+      return data;
+    },
     async reset() {
       this.dict_loading = true;
       const requests = [
@@ -612,6 +679,52 @@ export default {
       }
       let blob = new Blob(
         [JSON.stringify({ type: "translating_helper", data: export_data })],
+        {
+          type: "application/json;charset=utf-8"
+        }
+      );
+      saveAs(blob, `${this.data.title}.json`);
+    },
+    save_serv_conf() {
+      let export_data = [];
+      for (let i of this.data.text) {
+        if (i.type === "location") {
+          export_data.push({
+            type: "caption",
+            text: [i.name]
+          });
+        } else if (i.type === "text") {
+          export_data.push({
+            type: "message",
+            voice: i.voice,
+            text: [i.roasted_speaker, i.roasted_text]
+          });
+        }
+      }
+      let numcaption = 0;
+      let nummessage = 0;
+      for (let i in export_data) {
+        if (export_data[i].type === "caption") {
+          export_data[i].id = `${this.data.title}_c_${String(
+            numcaption
+          ).padStart(2, "0")}`;
+          numcaption++;
+        } else if (export_data[i].type === "message") {
+          export_data[i].id = `${this.data.title}_m_${
+            export_data[i].voice
+          }_${String(nummessage).padStart(3, "0")}`;
+          delete export_data[i].voice;
+          nummessage++;
+        }
+      }
+      let blob = new Blob(
+        [
+          JSON.stringify({
+            name: this.data.title,
+            language: "zh",
+            lines: export_data
+          })
+        ],
         {
           type: "application/json;charset=utf-8"
         }
@@ -717,6 +830,11 @@ export default {
       if (chara_aliases[name] !== undefined) {
         return chara_aliases[name];
       } else return "default_chara";
+    },
+    async save_capture() {
+      const el = this.$refs.capture;
+      let output = await this.$html2canvas(el, {});
+      this.$util.save_canvas(output, "test.jpg");
     }
   },
   computed: {

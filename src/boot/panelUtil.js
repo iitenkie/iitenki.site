@@ -1,8 +1,10 @@
+import "@babel/polyfill";
 import axios from "axios";
 import { LocalStorage } from "quasar";
 import AV from "leancloud-storage";
 import { date } from "quasar";
 import { saveAs } from "file-saver";
+import VueHtml2Canvas from "vue-html2canvas";
 
 // "async" is optional;
 // more info on params: https://quasar.dev/quasar-cli/boot-files
@@ -74,4 +76,5 @@ export default async ({ Vue }) => {
   Vue.prototype.$util = new Util();
   Vue.prototype.$AV = AV;
   Vue.prototype.$date = date;
+  Vue.use(VueHtml2Canvas);
 };
