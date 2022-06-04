@@ -568,8 +568,8 @@ export default {
       for (let i in text) {
         let el = text[i];
 
-        if (/^mes	(.+):(.+)	(.+)	(.+)$/.test(el)) {
-          const extract = el.match(/^mes	(.+):(.+)	(.+)	(.+)$/);
+        if (/^mes	(.+?):(.+?)	(.+?)	(.+?)$/.test(el)) {
+          const extract = el.match(/^mes	(.+?):(.+?)	(.+?)	(.+?)$/);
 
           let form = {
             type: "text",
@@ -581,30 +581,30 @@ export default {
             roasted_text: ""
           };
 
-          form.text = form.text.replace(/@s\((\d+)\)\{(.+)\}/g, size_replace);
+          form.text = form.text.replace(/@s\((\d+?)\)\{(.+?)\}/g, size_replace);
           form.text = form.text.replace(
             /@c\((.+)\)\{(.+)\}/g,
             '<span style="color: $1;">$2</span>'
           );
-          form.text = form.text.replace(/@b\{(.+)\}/g, "<b>$1</b>");
+          form.text = form.text.replace(/@b\{(.+?)\}/g, "<b>$1</b>");
 
           data.push(form);
-        } else if (/^bgm	(.+)	.*$/.test(el)) {
-          const extract = el.match(/^bgm	(.+)	.*$/);
+        } else if (/^bgm	(.+?)	.*$/.test(el)) {
+          const extract = el.match(/^bgm	(.+?)	.*$/);
           let form = {
             type: "bgm",
             name: extract[1]
           };
           data.push(form);
-        } else if (/^se	(.+)	.*$/.test(el)) {
-          const extract = el.match(/^se	(.+)	.*$/);
+        } else if (/^se	(.+?)	.*$/.test(el)) {
+          const extract = el.match(/^se	(.+?)	.*$/);
           let form = {
             type: "se",
             name: extract[1]
           };
           data.push(form);
-        } else if (/^caption	.+:(.+)	.*	.*	.*	.*	.*$/.test(el)) {
-          const extract = el.match(/^caption	.+:(.+)	.*	.*	.*	.*	.*$/);
+        } else if (/^caption	.+:(.+?)	.*	.*	.*	.*	.*$/.test(el)) {
+          const extract = el.match(/^caption	.+:(.+?)	.*	.*	.*	.*	.*$/);
           let form = {
             type: "location",
             name: extract[1]
