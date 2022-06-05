@@ -266,7 +266,7 @@
               flat
               bordered
               dense
-              class="bg-pink-1 text-h5 speaker-font cursor-pointer q-pa-sm"
+              class="bg-pink-1 text-h5 roasted-speaker-font cursor-pointer q-pa-sm"
               style="text-align: center;"
             >
               <div>
