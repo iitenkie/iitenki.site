@@ -295,6 +295,18 @@
                 color="red"
                 text-color="white"
               />
+              <q-avatar
+                v-else-if="item.type == 'actor_show'"
+                icon="person_add"
+                color="positive"
+                text-color="white"
+              />
+              <q-avatar
+                v-else-if="item.type == 'actor_hide'"
+                icon="person_remove"
+                color="negative"
+                text-color="white"
+              />
               {{ item.name }}
             </q-chip>
           </div>
@@ -568,7 +580,7 @@ export default {
       for (let i in text) {
         let el = text[i];
 
-        if (/^mes	(.+?):(.+?)	(.+?)	(.+?)$/.test(el)) {
+        if (/^mes	(.+?):(.+?):*.*	(.+?)	(.+?)$/.test(el)) {
           const extract = el.match(/^mes	(.+?):(.+?)	(.+?)	(.+?)$/);
 
           let form = {
@@ -607,6 +619,20 @@ export default {
           const extract = el.match(/^caption	.+:(.+?)	.*	.*	.*	.*	.*$/);
           let form = {
             type: "location",
+            name: extract[1]
+          };
+          data.push(form);
+        } else if (/^actor_show	(.+?)	.*	.*$/.test(el)) {
+          const extract = el.split("\t");
+          let form = {
+            type: "actor_show",
+            name: extract[1]
+          };
+          data.push(form);
+        } else if (/^actor_hide	(.+?)	.*	.*$/.test(el)) {
+          const extract = el.split("\t");
+          let form = {
+            type: "actor_hide",
             name: extract[1]
           };
           data.push(form);
