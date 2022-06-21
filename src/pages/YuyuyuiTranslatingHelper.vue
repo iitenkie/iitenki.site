@@ -580,8 +580,8 @@ export default {
       for (let i in text) {
         let el = text[i];
 
-        if (/^mes	(.+?):(.+?):*.*	(.+?)	(.+?)$/.test(el)) {
-          const extract = el.match(/^mes	(.+?):(.+?)	(.+?)	(.+?)$/);
+        if (/^mes	(.+?):(.+?)	(.*?)	(.+?)$/.test(el)) {
+          const extract = el.match(/^mes	(.+?):(.+?)	(.*?)	(.+?)$/);
 
           let form = {
             type: "text",
